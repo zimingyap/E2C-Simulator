@@ -1,0 +1,2 @@
+Episode,total_no_of_tasks,mapped,cancelled,URG_missed,BE_missed,Completion%,xCompletion%,totalCompletion%,consumed_energy%,energy_per_completion
+0,100,100,0,0,36,49.0,15.0,64.0,9.855657222222217,2.7719035937499985
