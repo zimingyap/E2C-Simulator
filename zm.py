@@ -17,7 +17,7 @@ from PyQt5.QtWidgets import (
     QMessageBox,
 
 )
-from PyQt5.QtGui import QColor, QPalette, QPainter
+from PyQt5.QtGui import QPainter, QPen
 from PyQt5.QtCore import (
     QPropertyAnimation,
     Qt,
@@ -25,16 +25,13 @@ from PyQt5.QtCore import (
     QThread,
     QSequentialAnimationGroup,
 )
-import pandas as pd
-import numpy as np
+
 import csv
 from os import makedirs
 
-from utils.simulator import Simulator, WorkerThread
+from utils.simulator import Simulator
 from utils.machine import Machine
 import utils.config as config
-# import utils.simulator as s
-# import zm as z
 
 
 class Statistic(QFrame):
@@ -131,7 +128,6 @@ class GUI(QMainWindow):
         self.conLine.setPen(Qt.red)
         self.conLine.drawLine(10,10,100,140)
         for i in range(len(self.m_coords)):
-            # print("CCCCCCCCCCC")
             b = QPushButton(self)
             b.setGeometry(self.m_coords[i][0]+200,self.m_coords[i][1],70,40)
             b.setText("Details")
@@ -464,9 +460,33 @@ class GUI(QMainWindow):
         mq.setFrameShape(QFrame.Box)
         mq.setGeometry(x, y, 41, 41)
 
-  
-            
-    
+    def paintEvent(self, e):
+        qp = QPainter()
+        qp.begin(self)
+        self.bq_sch_Lines(qp)
+        self.sch_m_Lines(qp)
+        qp.end()
+
+    # draw line from batch queue to scheduler
+    def bq_sch_Lines(self, qp):
+        pen = QPen(Qt.black, 2, Qt.DashLine)
+        sch_x = 500+85
+        sch_y = 580+41
+        for i in range(len(self.mq_coords)):
+            m_x = self.mq_coords[i][len(self.mq_coords)-1][0]#first machine queue coordinates
+            m_y = self.mq_coords[i][len(self.mq_coords)-1][1] +21#first machine queue coordinates
+            qp.setPen(pen)
+            qp.drawLine(sch_x, sch_y, m_x, m_y)
+    #draw lines from scheduler to machine queue
+    def sch_m_Lines(self, qp):
+        pen = QPen(Qt.black, 2, Qt.DashLine)
+        bq_x = self.bq_coords[0][0] +41#first batch queue coordinates
+        bq_y = self.bq_coords[0][1] +21#first batch queue coordinates
+        sch_x = 500
+        sch_y = 580+41.25
+        qp.setPen(pen)
+        qp.drawLine(bq_x, bq_y, sch_x, sch_y)
+        
 def load_config(path_to_config='./api.json'):
     try:
         f = open(path_to_config)
