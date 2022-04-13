@@ -15,7 +15,9 @@ from PyQt5.QtWidgets import (
     QGridLayout,
     QSlider,
     QMessageBox,
-
+    QTableWidget,
+    QTableWidgetItem,
+    QHeaderView
 )
 from PyQt5.QtGui import QPainter, QPen
 from PyQt5.QtCore import (
@@ -196,24 +198,29 @@ class GUI(QMainWindow):
             self.slider.setGeometry(200, 760, 200, 40)
             self.slider.setOrientation(Qt.Horizontal)
             self.slider.setMinimum(0)
-            self.slider.setMaximum(3000)
+            self.slider.setMaximum(1500)
+            self.slider.setInvertedAppearance(True)
             self.slider.setSliderPosition(self.timer)
             self.slider.valueChanged.connect(self.updateSlider)
             self.slider.valueChanged.connect(self.speed)
-            
             self.sliderLabel = QLabel(self)
             self.sliderLabel.setGeometry(400, 760, 200, 40)
             self.sliderLabel.setText("{:.1f}x".format(self.timer/1000))
+            self.mDetails = QPushButton("Machine Details", self)
+            self.mDetails.setGeometry(30, 900, 100, 50)
+            self.mDetails.setVisible(False)
+            self.mDetails.clicked.connect(lambda: self.createTable())
             self.thread.finished.connect(lambda: self.simulation.report(path_to_result))
             self.thread.finished.connect(self.statistics_info)
             self.thread.finished.connect(self.set_Vis)
-            
                 
-
+    # Show the visibility of the machine details buttons after simulation ended
     def set_Vis(self):
+        self.mDetails.setVisible(True)
         for i in range(len(self.machine_stats_btn)):
             self.machine_stats_btn[i].setVisible(True)
     
+    # End the thread/simulation
     def endThread(self):
         # if self.simulation.threadController == True:
         #     self.simulation.simPause(False)
@@ -226,26 +233,23 @@ class GUI(QMainWindow):
         self.thread.wait()
         # self.thread.exit()
         
-
+    # Control the speed of the simulation, this function calls a function in simulator.py
     def speed(self, value):
         self.simulation.setTimer(value/1000)
     
+    # Update the slider speed text
     def updateSlider(self,value):
-        self.sliderLabel.setText("{:.1f}x".format(value/1000,"2f"))
+        if value != 0:
+            self.sliderLabel.setText("{:.1f}x".format(1000/value,"2f"))
     
+    # Handling
     def handle_signal(self, d):
         print(d)
         if 'Type' in d:
             self.taskAnimation(120, 520, d)
         elif '%Completion' in d:
             self.machine_stats.append(d)
-            
-    # def create_machine_btn(self):
-        
-    #     # b.clicked.connect(lambda: self.create_machine_stat(self.machine_stats[i]))
-    #     # self.machine_stats_btn.append(b)
                 
-    
     def create_machine_stat(self,i):
         a = QMessageBox(self)
         a.setText("{}".format(self.machine_stats[i]))
@@ -253,8 +257,39 @@ class GUI(QMainWindow):
         a.setStandardButtons(QMessageBox.Ok)
         a.setIcon(QMessageBox.Information)
         a.exec()
+    def create_machine_details(self):
+        a = QMessageBox(self)
+        a.setText("{}".format(self.machine_stats))
+        a.setWindowTitle("Machine Statistics")
+        a.setStandardButtons(QMessageBox.Ok)
+        a.setIcon(QMessageBox.Information)
+        a.exec()
         
-            
+        
+    def createTable(self):
+        self.tableWidget = QTableWidget()
+  
+        #Row count
+        self.tableWidget.setRowCount(len(self.machine_stats)+1) 
+  
+        #Column count
+        self.tableWidget.setColumnCount(8)  
+  
+        self.tableWidget.setItem(0,0, QTableWidgetItem("Name"))
+        self.tableWidget.setItem(0,1, QTableWidgetItem("City"))
+        self.tableWidget.setItem(1,0, QTableWidgetItem("Aloysius"))
+        self.tableWidget.setItem(1,1, QTableWidgetItem("Indore"))
+        self.tableWidget.setItem(2,0, QTableWidgetItem("Alan"))
+        self.tableWidget.setItem(2,1, QTableWidgetItem("Bhopal"))
+        self.tableWidget.setItem(3,0, QTableWidgetItem("Arnavi"))
+        self.tableWidget.setItem(3,1, QTableWidgetItem("Mandsaur"))
+   
+        #Table will fit the screen horizontally
+        self.tableWidget.horizontalHeader().setStretchLastSection(True)
+        self.tableWidget.horizontalHeader().setSectionResizeMode(
+            QHeaderView.Stretch)
+   
+    # Create menu bar on top
     def create_menu_bar(self):
         menuBar = self.menuBar()
         # Creating menus using a QMenu object
@@ -265,6 +300,7 @@ class GUI(QMainWindow):
         menuBar.addMenu(editMenu)
         menuBar.addMenu(helpMenu)
 
+    # Set the stats of machines after simulation ends
     def statistics_info(self):
         self.statistic.TotalCompletion.setText("%Total Completion: {:.3f}".format(self.data['statistics']['%Total Completion']))
         self.statistic.TotalxCompletion.setText("%Total xCompletion: {:.3f}".format(self.data['statistics']['%Total xCompletion']))
@@ -274,6 +310,7 @@ class GUI(QMainWindow):
         self.statistic.consumedEnergy.setText("ConsumedEnergy%: {:.3f}".format(self.data['statistics']['consumed_energy%']))
         self.statistic.energyPerCompletion.setText("energy_per_completion: {:.3f}".format(self.data['statistics']['energy_per_completion']))
 
+    # draws batch queue on the left side
     def draw_batch_queue(self):
         overload = None
         if (self.data['batch_queue_size'] <= 4):
@@ -296,6 +333,7 @@ class GUI(QMainWindow):
             overload_dot.setText("...")
             overload_dot.setAlignment(Qt.AlignCenter)
 
+    # Controls the animation of the tasks
     def taskAnimation(self, x, y, d):
        
         self.tasks[d["Task id"]].resize(35, 35)
@@ -362,7 +400,8 @@ class GUI(QMainWindow):
             self.thread.wait()
             self.thread.quit()            
         self.anim.start()
-        
+     
+    # Draw the scheduler in the middle   
     def scheduling(self):
         scheduling_method = self.data['scheduler']
         round_scheduler = QLabel(self)
@@ -379,6 +418,7 @@ class GUI(QMainWindow):
         round_scheduler.setText("{}".format(scheduling_method))
         round_scheduler.setAlignment(Qt.AlignCenter)
 
+    # Draw the machines on the right side
     def draw_machine(self):
         machine_name = []
         config.init()
@@ -439,7 +479,6 @@ class GUI(QMainWindow):
             
             # Collect all the task that are completed    
             
-                
             # for i in range(len(self.m_coords)):
             #     t = QLabel(self)
             #     t.move(self.m_coords[i][0]+100, self.m_coords[i][1])
@@ -451,12 +490,13 @@ class GUI(QMainWindow):
             #       }
             #    """)
                 
-
+    # Draw machine queue
     def draw_machine_queue(self, x, y): 
         mq = QLabel(self)
         mq.setFrameShape(QFrame.Box)
         mq.setGeometry(x, y, 41, 41)
 
+    # Initialize QPainter for drawing line
     def paintEvent(self, e):
         qp = QPainter()
         qp.begin(self)
