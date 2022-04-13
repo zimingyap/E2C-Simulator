@@ -2,7 +2,7 @@
 
     "parameters":[
         {
-            "machine_queue_size":5,
+            "machine_queue_size":4,
             "batch_queue_size":5,
             "scheduling_method":"FEE",
             "fairness_factor": 0.5
@@ -43,7 +43,7 @@
             "name":"cpu",
             "power": 45.0,
             "idle_power": 10.0,
-            "replicas" : 3
+            "replicas" : 2
         },
         {   
 

@@ -104,6 +104,7 @@ class GUI(QMainWindow):
         self.mq_availability = {}
         self.machine_availability = {}
         self.batch_queue_availability = {}
+        self.machine_queue_size = config.machine_queue_size
         self.data = load_config()
         self.initUI()
 
@@ -123,10 +124,7 @@ class GUI(QMainWindow):
         self.draw_batch_queue()
         self.scheduling()
         self.draw_machine()
-        self.conLine = QPainter(self)
-        self.conLine.begin(self)
-        self.conLine.setPen(Qt.red)
-        self.conLine.drawLine(10,10,100,140)
+        print(self.mq_coords)
         for i in range(len(self.m_coords)):
             b = QPushButton(self)
             b.setGeometry(self.m_coords[i][0]+200,self.m_coords[i][1],70,40)
@@ -392,8 +390,8 @@ class GUI(QMainWindow):
         y_axis_size = 800
         y_axis_diff = int(y_axis_size/(len(machine_name)+1))
         machine_queue_overload = None
-        if (self.data['machine_queue_size'] <= 4):
-            machine_queue_size = self.data['machine_queue_size']
+        if (config.machine_queue_size <= 4):
+            machine_queue_size = config.machine_queue_size
         else:
             machine_queue_size = 4
             machine_queue_overload = True
@@ -428,7 +426,6 @@ class GUI(QMainWindow):
             for _ in range(machine_queue_size):
                 x_axis -= 40
                 self.draw_machine_queue(x_axis, y_axis)
-                # self.mq_coords.append({i:[x_axis,y_axis]})
                 mq_c.append([x_axis, y_axis])
                 mq_a.append(True)
             self.mq_coords[i] = mq_c
@@ -443,16 +440,16 @@ class GUI(QMainWindow):
             # Collect all the task that are completed    
             
                 
-            for i in range(len(self.m_coords)):
-                t = QLabel(self)
-                t.move(self.m_coords[i][0]+100, self.m_coords[i][1])
-                t.resize(80, 80)
-                t.setStyleSheet("""
-               QLabel {
-                  border: 3px solid black;
-                  background-color: #737d84;
-                  }
-               """)
+            # for i in range(len(self.m_coords)):
+            #     t = QLabel(self)
+            #     t.move(self.m_coords[i][0]+100, self.m_coords[i][1])
+            #     t.resize(80, 80)
+            #     t.setStyleSheet("""
+            #    QLabel {
+            #       border: 3px solid black;
+            #       background-color: #737d84;
+            #       }
+            #    """)
                 
 
     def draw_machine_queue(self, x, y): 
@@ -473,10 +470,11 @@ class GUI(QMainWindow):
         sch_x = 500+85
         sch_y = 580+41
         for i in range(len(self.mq_coords)):
-            m_x = self.mq_coords[i][len(self.mq_coords)-1][0]#first machine queue coordinates
-            m_y = self.mq_coords[i][len(self.mq_coords)-1][1] +21#first machine queue coordinates
+            m_x = self.mq_coords[i][self.machine_queue_size-1][0]#first machine queue coordinates
+            m_y = self.mq_coords[i][self.machine_queue_size-1][1] +21#first machine queue coordinates
             qp.setPen(pen)
             qp.drawLine(sch_x, sch_y, m_x, m_y)
+            
     #draw lines from scheduler to machine queue
     def sch_m_Lines(self, qp):
         pen = QPen(Qt.black, 2, Qt.DashLine)
