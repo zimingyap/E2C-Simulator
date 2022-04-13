@@ -17,7 +17,8 @@ from PyQt5.QtWidgets import (
     QMessageBox,
     QTableWidget,
     QTableWidgetItem,
-    QHeaderView
+    QHeaderView,
+    QSizePolicy
 )
 from PyQt5.QtGui import QPainter, QPen
 from PyQt5.QtCore import (
@@ -126,7 +127,7 @@ class GUI(QMainWindow):
         self.draw_batch_queue()
         self.scheduling()
         self.draw_machine()
-        print(self.mq_coords)
+        # self.createTable()
         for i in range(len(self.m_coords)):
             b = QPushButton(self)
             b.setGeometry(self.m_coords[i][0]+200,self.m_coords[i][1],70,40)
@@ -273,22 +274,46 @@ class GUI(QMainWindow):
         self.tableWidget.setRowCount(len(self.machine_stats)+1) 
   
         #Column count
-        self.tableWidget.setColumnCount(8)  
-  
-        self.tableWidget.setItem(0,0, QTableWidgetItem("Name"))
-        self.tableWidget.setItem(0,1, QTableWidgetItem("City"))
-        self.tableWidget.setItem(1,0, QTableWidgetItem("Aloysius"))
-        self.tableWidget.setItem(1,1, QTableWidgetItem("Indore"))
-        self.tableWidget.setItem(2,0, QTableWidgetItem("Alan"))
-        self.tableWidget.setItem(2,1, QTableWidgetItem("Bhopal"))
-        self.tableWidget.setItem(3,0, QTableWidgetItem("Arnavi"))
-        self.tableWidget.setItem(3,1, QTableWidgetItem("Mandsaur"))
-   
-        #Table will fit the screen horizontally
-        self.tableWidget.horizontalHeader().setStretchLastSection(True)
-        self.tableWidget.horizontalHeader().setSectionResizeMode(
-            QHeaderView.Stretch)
-   
+        self.tableWidget.setColumnCount(len(self.machine_stats[0]))  
+        self.tableWidget.setHorizontalHeaderLabels(['Machine name','%Completion', '# of %Completion','%XCompletion','# of %XCompletion','#Missed URG','Missed BE','%Energy','%Wasted Energy'])
+        self.tableWidget.resizeColumnsToContents()
+        self.tableWidget.resizeRowsToContents()
+        for i,v in enumerate(self.machine_stats):
+            machineName = QTableWidgetItem(str(v['Machine']))
+            completion = QTableWidgetItem(str(round(v['%Completion'],2)))
+            no_completion = QTableWidgetItem(str(round(v['# of %Completion'],2)))
+            XCompletion = QTableWidgetItem(str(round(v['%XCompletion'],2)))
+            no_XCompletion = QTableWidgetItem(str(round(v['# of %XCompletion'],2)))
+            missed_URG = QTableWidgetItem(str(round(v['#Missed URG'],2)))
+            missed_BE = QTableWidgetItem(str(round(v['Missed BE'],2)))
+            energy = QTableWidgetItem(str(round(v['%Energy'],2)))
+            wasted_energy = QTableWidgetItem(str(round(v['%Wasted Energy'],2)))
+            
+            self.tableWidget.setItem(i,0,machineName)           
+            self.tableWidget.setItem(i,1,completion)
+            self.tableWidget.setItem(i,2,no_completion)
+            self.tableWidget.setItem(i,3,XCompletion)
+            self.tableWidget.setItem(i,4,no_XCompletion)
+            self.tableWidget.setItem(i,5,missed_URG)
+            self.tableWidget.setItem(i,6,missed_BE)
+            self.tableWidget.setItem(i,7,energy)
+            self.tableWidget.setItem(i,8,wasted_energy)
+            
+        self.tableWidget.resizeColumnsToContents()
+        self.tableWidget.resizeRowsToContents()
+        
+
+        self.tableWidget.setFixedSize(self.tableWidget.horizontalHeader().length() + 
+                        self.tableWidget.verticalHeader().width(),
+                        self.tableWidget.verticalHeader().length() + 
+                        self.tableWidget.horizontalHeader().height())
+       
+
+        self.tableWidget.verticalHeader().setStretchLastSection(True)
+        self.tableWidget.verticalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)       
+        # self.tableWidget.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
+        self.tableWidget.show()
     # Create menu bar on top
     def create_menu_bar(self):
         menuBar = self.menuBar()
