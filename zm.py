@@ -18,7 +18,6 @@ from PyQt5.QtWidgets import (
     QTableWidget,
     QTableWidgetItem,
     QHeaderView,
-    QSizePolicy
 )
 from PyQt5.QtGui import QPainter, QPen
 from PyQt5.QtCore import (
@@ -26,7 +25,7 @@ from PyQt5.QtCore import (
     Qt,
     QPoint,
     QThread,
-    QSequentialAnimationGroup,
+    QSequentialAnimationGroup
 )
 
 import csv
@@ -93,11 +92,9 @@ class GUI_SIM(QFrame):
 class GUI(QMainWindow):
     def __init__(self):
         super(GUI, self).__init__()
-        # 5 colors, each color represent a task. Illustrate that a task is moving forward when the first task is pop to scheduler
-        # config.init()
         self.color = ["background-color:lightgreen", "background-color:lightblue",
                       "background-color:lightsalmon", "background-color:lightpink", "background-color:lightgoldenrodyellow"]
-        self.no_of_task = 100  # need to read from somewhere
+        self.no_of_task = 150  # need to read from somewhere
         self.tasks = []
         self.machine_stats = []
         self.machine_stats_btn = []
@@ -107,6 +104,8 @@ class GUI(QMainWindow):
         self.mq_availability = {}
         self.machine_availability = {}
         self.batch_queue_availability = {}
+        self.finishedTasks = []
+        self.finishedTasksLabel = []
         self.machine_queue_size = config.machine_queue_size
         self.data = load_config()
         self.initUI()
@@ -127,14 +126,13 @@ class GUI(QMainWindow):
         self.draw_batch_queue()
         self.scheduling()
         self.draw_machine()
-        # self.createTable()
-        for i in range(len(self.m_coords)):
-            b = QPushButton(self)
-            b.setGeometry(self.m_coords[i][0]+200,self.m_coords[i][1],70,40)
-            b.setText("Details")
-            b.setVisible(False)
-            self.machine_stats_btn.append(b)
-            self.machine_stats_btn[i].clicked.connect(lambda: self.create_machine_stat(i))
+        # for i in range(len(self.m_coords)):
+        #     b = QPushButton(self)
+        #     b.setGeometry(self.m_coords[i][0]+200,self.m_coords[i][1],70,40)
+        #     b.setText("Details")
+        #     b.setVisible(False)
+        #     self.machine_stats_btn.append(b)
+        #     self.machine_stats_btn[i].clicked.connect(lambda: self.create_machine_stat(i))
         # self.create_machine_btn
         for _ in range(self.no_of_task):
             a = QLabel(self)
@@ -223,12 +221,6 @@ class GUI(QMainWindow):
     
     # End the thread/simulation
     def endThread(self):
-        # if self.simulation.threadController == True:
-        #     self.simulation.simPause(False)
-        #     self.pauseBtn.setText("Resume")
-        # else:
-        #     self.simulation.simPause(True)
-        #     self.pauseBtn.setText("Pause")s
         self.simulation.threadController = False
         self.thread.terminate()
         self.thread.wait()
@@ -250,7 +242,8 @@ class GUI(QMainWindow):
             self.taskAnimation(120, 520, d)
         elif '%Completion' in d:
             self.machine_stats.append(d)
-                
+    
+    # Pop up message box to show statistics of each machine          
     def create_machine_stat(self,i):
         a = QMessageBox(self)
         a.setText("{}".format(self.machine_stats[i]))
@@ -258,22 +251,11 @@ class GUI(QMainWindow):
         a.setStandardButtons(QMessageBox.Ok)
         a.setIcon(QMessageBox.Information)
         a.exec()
-    def create_machine_details(self):
-        a = QMessageBox(self)
-        a.setText("{}".format(self.machine_stats))
-        a.setWindowTitle("Machine Statistics")
-        a.setStandardButtons(QMessageBox.Ok)
-        a.setIcon(QMessageBox.Information)
-        a.exec()
-        
-        
+
+    # Create machine stat table
     def createTable(self):
         self.tableWidget = QTableWidget()
-  
-        #Row count
         self.tableWidget.setRowCount(len(self.machine_stats)+1) 
-  
-        #Column count
         self.tableWidget.setColumnCount(len(self.machine_stats[0]))  
         self.tableWidget.setHorizontalHeaderLabels(['Machine name','%Completion', '# of %Completion','%XCompletion','# of %XCompletion','#Missed URG','Missed BE','%Energy','%Wasted Energy'])
         self.tableWidget.resizeColumnsToContents()
@@ -405,6 +387,8 @@ class GUI(QMainWindow):
             self.anim.setStartValue(QPoint(coord_x, coord_y))
             self.anim.setEndValue(QPoint(self.m_coords[d['Machine']][0]+100, self.m_coords[d['Machine']][1]))
             self.anim.setDuration(100)
+            self.finishedTasks[d['Machine']].append(d['Task id'])
+            self.finishedTasksLabel[d['Machine']].setText("Finished tasks: {}".format(self.finishedTasks[d['Machine']][:-4:-1])) #show last 3 element of finished tasks and reverse it
             self.anim.stop()
         elif d['Event Type'] == "DROPPED_RUNNING_TASK":
             mq_coord_x = self.mq_coords[d['Machine']][0][0]
@@ -501,19 +485,15 @@ class GUI(QMainWindow):
                 overload_dot.setText("...")
                 overload_dot.setAlignment(Qt.AlignCenter)
   
+        for i in range(len(self.m_coords)):
+            t = QLabel(self)
+            t.move(self.m_coords[i][0]+100, self.m_coords[i][1])
+            t.resize(200, 80)
+            t.setText("Finished tasks: ")
+            print("Machine {}".format(i))
+            self.finishedTasksLabel.append(t)
+            self.finishedTasks.append([])
             
-            # Collect all the task that are completed    
-            
-            # for i in range(len(self.m_coords)):
-            #     t = QLabel(self)
-            #     t.move(self.m_coords[i][0]+100, self.m_coords[i][1])
-            #     t.resize(80, 80)
-            #     t.setStyleSheet("""
-            #    QLabel {
-            #       border: 3px solid black;
-            #       background-color: #737d84;
-            #       }
-            #    """)
                 
     # Draw machine queue
     def draw_machine_queue(self, x, y): 
@@ -567,7 +547,6 @@ def window():
     win = GUI()
     win.show()
     app.exec_()
-    # sys.exit(app.exec_())
 
 
 if __name__ == '__main__':
