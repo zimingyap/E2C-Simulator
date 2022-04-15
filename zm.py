@@ -297,6 +297,7 @@ class GUI(QMainWindow):
 
     # Control the speed of the simulation, this function calls a function in simulator.py
     def speed(self, value):
+        self.timer = value
         self.simulation.setTimer(value/1000)
 
     # Update the slider speed text
@@ -439,7 +440,7 @@ class GUI(QMainWindow):
         if d['Event Type'] == 'INCOMING':
             for i, v in enumerate(self.batch_queue_availability):
                 if v == True:
-                    self.anim.setDuration(1000)
+                    self.anim.setDuration(self.timer/3)
                     self.anim.setStartValue(QPoint(x, 600))
                     self.anim.setEndValue(
                         QPoint(self.bq_coords[i][0], self.bq_coords[i][1]+1))
@@ -469,14 +470,14 @@ class GUI(QMainWindow):
             coord_y = self.m_coords[d['Machine']][1]
             self.anim.setStartValue(QPoint(mq_coord_x + 3, mq_coord_y + 3))
             self.anim.setEndValue(QPoint(coord_x+20, coord_y+15))
-            self.anim.setDuration(100)
+            self.anim.setDuration(self.timer/3)
         elif d['Event Type'] == "COMPLETION":
             coord_x = self.m_coords[d['Machine']][0]
             coord_y = self.m_coords[d['Machine']][1]
             self.anim.setStartValue(QPoint(coord_x, coord_y))
             self.anim.setEndValue(
                 QPoint(self.m_coords[d['Machine']][0]+100, self.m_coords[d['Machine']][1]))
-            self.anim.setDuration(100)
+            self.anim.setDuration(self.timer/3)
             self.finishedTasks[d['Machine']].append(d['Task id'])
             self.finishedTasksLabel[d['Machine']].setText("Finished tasks: {}".format(
                 self.finishedTasks[d['Machine']][:-4:-1]))  # show last 3 element of finished tasks and reverse it
@@ -489,7 +490,7 @@ class GUI(QMainWindow):
             coord_y = self.m_coords[d['Machine']][1]
             self.anim.setStartValue(QPoint(coord_x+20, coord_y+15))
             self.anim.setEndValue(QPoint(mq_coord_x + 3, mq_coord_y + 3))
-            self.anim.setDuration(100)
+            self.anim.setDuration(self.timer/3)
 
             # self.tasks[d["Task id"]].deleteLater()
         elif d['Event Type'] == "MISSED":
