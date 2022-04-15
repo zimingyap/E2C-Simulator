@@ -1,3 +1,166 @@
 
-
-=============== EPISODE#0 ===============
+Task:0 		 ARRIVING  @time:0.701 
+[ Task(0), Machine(2) ]: RUNNING        @time(0.701) exec:0.912
+Task:0 		 COMPLETION  @time:1.613 
+[ Task(0), Machine(2) ]: COMPLETED      @time(1.613)
+Task:1 		 ARRIVING  @time:2.258 
+[ Task(1), Machine(2) ]: RUNNING        @time(2.258) exec:0.674
+Task:1 		 COMPLETION  @time:2.932 
+[ Task(1), Machine(2) ]: COMPLETED      @time(2.932)
+Task:2 		 ARRIVING  @time:3.058 
+[ Task(2), Machine(2) ]: RUNNING        @time(3.058) exec:1.394
+Task:3 		 ARRIVING  @time:3.909 
+Task:4 		 ARRIVING  @time:4.333 
+Task:2 		 COMPLETION  @time:4.452 
+[ Task(2), Machine(2) ]: COMPLETED      @time(4.452)
+[ Task(3), Machine(2) ]: RUNNING        @time(4.452) exec:0.767
+Task:5 		 ARRIVING  @time:4.461 
+[ Task(5), Machine(0) ]: RUNNING        @time(4.461) exec:4.341
+Task:3 		 COMPLETION  @time:5.219 
+[ Task(3), Machine(2) ]: COMPLETED      @time(5.219)
+[ Task(4), Machine(2) ]: RUNNING        @time(5.219) exec:0.608
+Task:6 		 ARRIVING  @time:5.691 
+[ Task(6), Machine(1) ]: RUNNING        @time(5.691) exec:3.297
+Task:4 		 COMPLETION  @time:5.827 
+[ Task(4), Machine(2) ]: COMPLETED      @time(5.827)
+Task:7 		 ARRIVING  @time:6.579 
+[ Task(7), Machine(2) ]: RUNNING        @time(6.579) exec:2.956
+Task:8 		 ARRIVING  @time:6.897 
+Task:9 		 ARRIVING  @time:7.163 
+Task:10 		 ARRIVING  @time:7.465 
+Task:11 		 ARRIVING  @time:7.67 
+Task:5 		 COMPLETION  @time:8.802 
+[ Task(5), Machine(0) ]: XCOMPLETED      @time(8.802)
+[ Task(9), Machine(0) ]: RUNNING        @time(8.802) exec:11.529
+Task:6 		 COMPLETION  @time:8.988 
+[ Task(6), Machine(1) ]: XCOMPLETED      @time(8.988)
+Task:7 		 COMPLETION  @time:9.535 
+[ Task(7), Machine(2) ]: COMPLETED      @time(9.535)
+[ Task(8), Machine(2) ]: RUNNING        @time(9.535) exec:1.851
+Task:12 		 ARRIVING  @time:10.468 
+Task:13 		 ARRIVING  @time:10.519 
+Task:8 		 COMPLETION  @time:11.386 
+[ Task(8), Machine(2) ]: XCOMPLETED      @time(11.386)
+[ Task(10), Machine(2) ]: RUNNING        @time(11.386) exec:0.591
+Task:9 		 DROPPED_RUNNING_TASK  @time:11.663 
+[ Task(9), Machine(0) ]: MISSED         @time(11.663)
+Task:10 		 DROPPED_RUNNING_TASK  @time:11.965 
+[ Task(11), Machine(2) ]: RUNNING        @time(11.965) exec:1.420
+[ Task(11), Machine(2) ]: MISSED         @time(12.170)
+Task:11 		 DROPPED_RUNNING_TASK  @time:12.17 
+[ Task(12), Machine(2) ]: RUNNING        @time(12.170) exec:3.162
+[ Task(12), Machine(2) ]: MISSED         @time(14.968)
+Task:14 		 ARRIVING  @time:12.365 
+[ Task(14), Machine(0) ]: RUNNING        @time(12.365) exec:5.064
+Task:15 		 ARRIVING  @time:13.836 
+[ Task(15), Machine(1) ]: RUNNING        @time(13.836) exec:8.387
+Task:12 		 DROPPED_RUNNING_TASK  @time:14.968 
+[ Task(13), Machine(2) ]: RUNNING        @time(14.968) exec:2.116
+[ Task(13), Machine(2) ]: MISSED         @time(15.019)
+Task:13 		 DROPPED_RUNNING_TASK  @time:15.019 
+[ Task(13), Machine(2) ]: MISSED         @time(15.019)
+Task:16 		 ARRIVING  @time:15.302 
+[ Task(16), Machine(2) ]: RUNNING        @time(15.302) exec:2.838
+Task:17 		 ARRIVING  @time:16.405 
+Task:14 		 DROPPED_RUNNING_TASK  @time:16.865000000000002 
+[ Task(17), Machine(0) ]: RUNNING        @time(16.865) exec:12.529
+[ Task(17), Machine(0) ]: MISSED         @time(20.905)
+Task:18 		 ARRIVING  @time:17.585 
+Task:16 		 COMPLETION  @time:18.14 
+[ Task(16), Machine(2) ]: COMPLETED      @time(18.140)
+Task:15 		 DROPPED_RUNNING_TASK  @time:18.336 
+[ Task(18), Machine(1) ]: RUNNING        @time(18.336) exec:1.641
+[ Task(18), Machine(1) ]: MISSED         @time(inf)
+Task:19 		 ARRIVING  @time:19.297 
+[ Task(19), Machine(2) ]: RUNNING        @time(19.297) exec:0.992
+Task:20 		 ARRIVING  @time:19.853 
+Task:18 		 COMPLETION  @time:19.976999999999997 
+[ Task(18), Machine(1) ]: COMPLETED      @time(19.977)
+Task:19 		 COMPLETION  @time:20.289 
+[ Task(19), Machine(2) ]: COMPLETED      @time(20.289)
+[ Task(20), Machine(2) ]: RUNNING        @time(20.289) exec:0.929
+Task:17 		 DROPPED_RUNNING_TASK  @time:20.905 
+[ Task(17), Machine(0) ]: MISSED         @time(20.905)
+Task:20 		 COMPLETION  @time:21.218 
+[ Task(20), Machine(2) ]: COMPLETED      @time(21.218)
+Task:21 		 ARRIVING  @time:23.012 
+[ Task(21), Machine(2) ]: RUNNING        @time(23.012) exec:0.890
+Task:21 		 COMPLETION  @time:23.902 
+[ Task(21), Machine(2) ]: COMPLETED      @time(23.902)
+Task:22 		 ARRIVING  @time:25.149 
+[ Task(22), Machine(0) ]: RUNNING        @time(25.149) exec:8.100
+Task:23 		 ARRIVING  @time:26.958 
+[ Task(23), Machine(1) ]: RUNNING        @time(26.958) exec:1.967
+Task:24 		 ARRIVING  @time:27.146 
+[ Task(24), Machine(2) ]: RUNNING        @time(27.146) exec:2.392
+Task:25 		 ARRIVING  @time:27.153 
+Task:23 		 COMPLETION  @time:28.924999999999997 
+[ Task(23), Machine(1) ]: COMPLETED      @time(28.925)
+Task:26 		 ARRIVING  @time:29.191 
+Task:24 		 COMPLETION  @time:29.538 
+[ Task(24), Machine(2) ]: COMPLETED      @time(29.538)
+[ Task(25), Machine(2) ]: RUNNING        @time(29.538) exec:1.201
+Task:22 		 DROPPED_RUNNING_TASK  @time:29.649 
+[ Task(22), Machine(0) ]: MISSED         @time(29.649)
+Task:27 		 ARRIVING  @time:30.407 
+[ Task(27), Machine(0) ]: RUNNING        @time(30.407) exec:4.339
+Task:28 		 ARRIVING  @time:30.587 
+Task:29 		 ARRIVING  @time:30.672 
+[ Task(29), Machine(1) ]: RUNNING        @time(30.672) exec:7.377
+Task:25 		 COMPLETION  @time:30.739 
+[ Task(25), Machine(2) ]: XCOMPLETED      @time(30.739)
+[ Task(26), Machine(2) ]: RUNNING        @time(30.739) exec:3.012
+Task:30 		 ARRIVING  @time:31.538 
+Task:31 		 ARRIVING  @time:31.976 
+Task:26 		 DROPPED_RUNNING_TASK  @time:33.691 
+[ Task(28), Machine(2) ]: RUNNING        @time(33.691) exec:1.438
+[ Task(28), Machine(2) ]: MISSED         @time(35.087)
+Task:27 		 COMPLETION  @time:34.746 
+[ Task(27), Machine(0) ]: XCOMPLETED      @time(34.746)
+Task:28 		 DROPPED_RUNNING_TASK  @time:35.087 
+[ Task(30), Machine(2) ]: RUNNING        @time(35.087) exec:1.535
+[ Task(30), Machine(2) ]: MISSED         @time(36.038)
+Task:29 		 DROPPED_RUNNING_TASK  @time:35.172 
+[ Task(29), Machine(1) ]: MISSED         @time(35.172)
+Task:30 		 DROPPED_RUNNING_TASK  @time:36.038 
+[ Task(31), Machine(2) ]: RUNNING        @time(36.038) exec:0.614
+[ Task(31), Machine(2) ]: MISSED         @time(36.476)
+Task:32 		 ARRIVING  @time:36.356 
+Task:33 		 ARRIVING  @time:36.469 
+[ Task(33), Machine(0) ]: RUNNING        @time(36.469) exec:1.760
+Task:31 		 DROPPED_RUNNING_TASK  @time:36.476 
+[ Task(32), Machine(2) ]: RUNNING        @time(36.476) exec:0.656
+[ Task(32), Machine(2) ]: MISSED         @time(inf)
+Task:34 		 ARRIVING  @time:36.685 
+Task:32 		 COMPLETION  @time:37.132 
+[ Task(32), Machine(2) ]: COMPLETED      @time(37.132)
+[ Task(34), Machine(2) ]: RUNNING        @time(37.132) exec:0.941
+Task:35 		 ARRIVING  @time:37.553 
+[ Task(35), Machine(1) ]: RUNNING        @time(37.553) exec:5.487
+Task:36 		 ARRIVING  @time:37.742 
+Task:34 		 COMPLETION  @time:38.073 
+[ Task(34), Machine(2) ]: COMPLETED      @time(38.073)
+[ Task(36), Machine(2) ]: RUNNING        @time(38.073) exec:1.924
+Task:37 		 ARRIVING  @time:38.213 
+Task:38 		 ARRIVING  @time:38.226 
+Task:33 		 COMPLETION  @time:38.229 
+[ Task(33), Machine(0) ]: COMPLETED      @time(38.229)
+Task:39 		 ARRIVING  @time:38.879 
+Task:40 		 ARRIVING  @time:38.988 
+Task:41 		 ARRIVING  @time:39.653 
+Task:36 		 COMPLETION  @time:39.997 
+[ Task(36), Machine(2) ]: COMPLETED      @time(39.997)
+[ Task(37), Machine(2) ]: RUNNING        @time(39.997) exec:1.124
+Task:42 		 ARRIVING  @time:40.053 
+Task:43 		 ARRIVING  @time:40.213 
+[ Task(43), Machine(0) ]: RUNNING        @time(40.213) exec:3.297
+Task:37 		 COMPLETION  @time:41.121 
+[ Task(37), Machine(2) ]: COMPLETED      @time(41.121)
+[ Task(38), Machine(2) ]: RUNNING        @time(41.121) exec:1.189
+Task:44 		 ARRIVING  @time:41.442 
+Task:45 		 ARRIVING  @time:41.625 
+Task:35 		 DROPPED_RUNNING_TASK  @time:42.053 
+[ Task(41), Machine(1) ]: RUNNING        @time(42.053) exec:2.193
+[ Task(41), Machine(1) ]: MISSED         @time(44.153)
+Task:38 		 COMPLETION  @time:42.31 
+[ Task(38), Machine(2) ]: XCOMPLETED      @time(42.310)

@@ -62,7 +62,6 @@ else:
         
         simulation.run()
         row, task_report = simulation.report(path_to_result)   
-        simulation.monitor()
         writer.writerows(row)
         df_task_based_report = df_task_based_report.append(task_report, ignore_index=True)    
     report_summary.close()

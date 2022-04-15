@@ -31,7 +31,7 @@ class Simulator(QObject):
         self.gui_statistic = {}
         self.check_sim = None
         self.total_tasks = None
-        self.threadController = True
+        self.threadController = 1
     def create_event_queue(self):
         """In this function, csv file is convert into DataFrame. Tasks are created here with the 
         estimated time, execution time, arrival time from DataFrame. 
@@ -128,7 +128,7 @@ class Simulator(QObject):
         # win = GUI()
         # win.show()
         # sys.exit(app.exec_())
-        while config.event_queue.event_list and config.available_energy > 0.0 and self.threadController:
+        while config.event_queue.event_list and config.available_energy > 0.0:
             # use to pause the simulator
             # if config.gui == 1:
             #     print(self.threadController)
@@ -136,6 +136,8 @@ class Simulator(QObject):
             #         print("threadddd")  
             #         print("Simulation is paused")
             #         time.sleep(1)
+            while self.threadController == 0:
+                time.sleep(1)
             self.idle_energy_consumption()
             event = config.event_queue.get_first_event()
             task = event.event_details
@@ -379,7 +381,7 @@ class Simulator(QObject):
         self.timer = time
         
     def simPause(self,value):
-        self.threadController == False
+        self.threadController = value
 
 class WorkerThread(QThread):
     update_progress = pyqtSignal(dict)

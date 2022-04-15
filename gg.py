@@ -1,63 +1,27 @@
-from PyQt5.QtWidgets import (
-    QWidget,
-    QApplication,
-    QLabel,
-    QFrame,
-    QMainWindow,
-    QMenu,
-    QPushButton,
-    QVBoxLayout,
-    QHBoxLayout,
-    QSlider,
-    QGridLayout,
-    QSlider,
-    QMessageBox,
-    QTableWidget,
-    QTableWidgetItem,
-    QHeaderView,
-    QAction,
-    QScrollArea
-)
-from PyQt5.QtGui import QPainter, QPen
-from PyQt5.QtCore import (
-    QPropertyAnimation,
-    Qt,
-    QPoint,
-    QThread,
-    QSequentialAnimationGroup,
-    QCoreApplication,
-    QProcess,
+# importing the csv module 
+import csv 
     
-)
-import sys
-class ScrollMessageBox(QMessageBox):
-   def __init__(self, l, *args, **kwargs):
-      QMessageBox.__init__(self, *args, **kwargs)
-      scroll = QScrollArea(self)
-      scroll.setWidgetResizable(True)
-      self.content = QWidget()
-      scroll.setWidget(self.content)
-      lay = QVBoxLayout(self.content)
-      for item in l:
-         lay.addWidget(QLabel(item, self))
-      self.layout().addWidget(scroll, 0, 0, 1, self.layout().columnCount())
-      self.setStyleSheet("QScrollArea{min-width:300 px; min-height: 400px}")
-
-class W(QWidget):
-   def __init__(self):
-      super().__init__()
-      self.btn = QPushButton('Show Message', self)
-      self.btn.setGeometry(10, 10, 100, 100)
-      self.btn.clicked.connect(self.buttonClicked)
-      self.lst = [str(i) for i in range(2000)]
-      self.show()
-
-
-   def buttonClicked(self):
-      result = ScrollMessageBox(self.lst, None)
-      result.exec_()
-
-if __name__ == "__main__":
-   app = QApplication(sys.argv)
-   gui = W()
-   sys.exit(app.exec_())
+# my data rows as dictionary objects 
+mydict =[{'branch': 'COE', 'cgpa': '9.0', 'name': 'Nikhil', 'year': '2'}, 
+         {'branch': 'COE', 'cgpa': '9.1', 'name': 'Sanchit', 'year': '2'}, 
+         {'branch': 'IT', 'cgpa': '9.3', 'name': 'Aditya', 'year': '2'}, 
+         {'branch': 'SE', 'cgpa': '9.5', 'name': 'Sagar', 'year': '1'}, 
+         {'branch': 'MCE', 'cgpa': '7.8', 'name': 'Prateek', 'year': '3'}, 
+         {'branch': 'EP', 'cgpa': '9.1', 'name': 'Sahil', 'year': '2'}] 
+    
+# field names 
+fields = ['name', 'branch', 'year', 'cgpa'] 
+    
+# name of csv file 
+filename = "university_records.csv"
+    
+# writing to csv file 
+with open(filename, 'w') as csvfile: 
+    # creating a csv dict writer object 
+    writer = csv.DictWriter(csvfile, fieldnames = fields) 
+        
+    # writing headers (field names) 
+    writer.writeheader() 
+        
+    # writing data rows 
+    writer.writerows(mydict) 
