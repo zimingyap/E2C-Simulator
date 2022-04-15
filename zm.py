@@ -224,6 +224,7 @@ class GUI(QMainWindow):
             self.thread.started.connect(self.simulation.run)
 
             self.timer = 1000
+            
             self.startBtn = QPushButton("Start", self)
             self.startBtn.setGeometry(30, 750, 100, 50)
             self.startBtn.clicked.connect(lambda: self.thread.start())
@@ -231,21 +232,30 @@ class GUI(QMainWindow):
             self.pauseBtn.setGeometry(30, 800, 100, 50)
             self.pauseBtn.clicked.connect(
                 lambda: self.simulation.setTimer(10000))
+            
             self.endBtn = QPushButton("End", self)
             self.endBtn.setGeometry(30, 850, 100, 50)
             self.endBtn.clicked.connect(lambda: self.endThread())
+            
             self.slider = QSlider(self)
             self.slider.setGeometry(200, 760, 200, 40)
             self.slider.setOrientation(Qt.Horizontal)
-            self.slider.setMinimum(0)
-            self.slider.setMaximum(1500)
+            self.slider.setMinimum(50)
+            self.slider.setMaximum(2000)
             self.slider.setInvertedAppearance(True)
             self.slider.setSliderPosition(self.timer)
             self.slider.valueChanged.connect(self.updateSlider)
             self.slider.valueChanged.connect(self.speed)
+            
             self.sliderLabel = QLabel(self)
             self.sliderLabel.setGeometry(400, 760, 200, 40)
             self.sliderLabel.setText("{:.1f}x".format(self.timer/1000))
+            
+            self.finishSimBtn = QPushButton("Finish Simulation", self)
+            self.finishSimBtn.setGeometry(200, 850, 100, 50)
+            self.finishSimBtn.adjustSize()
+            self.finishSimBtn.clicked.connect(lambda: self.simulation.setTimer(0))
+            
             self.restartBtn = QPushButton("Restart", self)
             self.restartBtn.setGeometry(30, 900, 100, 50)
             self.restartBtn.setEnabled(False)
@@ -263,14 +273,14 @@ class GUI(QMainWindow):
             self.thread.finished.connect(
                 lambda: self.simulation.report(path_to_result))
             self.thread.finished.connect(self.statistics_info)
-            self.thread.finished.connect(self.setEnabled)
+            self.thread.finished.connect(self.setEnabledEnd)
 
     def getLog(self):
         result = ScrollMessageBox(self.finishedLog, "Full logs", None)
         result.exec_()
-    # Show the visibility of the machine details buttons after simulation ended
-
-    def setEnabled(self):
+        
+    # Enable buttons
+    def setEnabledEnd(self):
         self.mDetails.setEnabled(True)
         self.restartBtn.setEnabled(True)
         self.getLogBtn.setEnabled(True)
