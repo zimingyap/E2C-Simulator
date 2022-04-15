@@ -200,7 +200,7 @@ class Simulator(QObject):
                 # config.gui_task.append({"Task id":task.id,"Event Type":event.event_type.name, "Time":event.time})
                 time.sleep(self.timer)
                 
-                self.progress.emit({"Task id":task.id,"Event Type":event.event_type.name, "Time":event.time, "Machine": assigned_machine.id, "Type":'task',"aa":1})
+                self.progress.emit({"Task id":task.id,"Event Type":event.event_type.name, "Time":event.time, "Machine": assigned_machine.id, "Type":'task'})
                 if (assigned_machine.machine_log != self.check_sim):
                     time.sleep(self.timer)
                     self.progress.emit(assigned_machine.machine_log)

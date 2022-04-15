@@ -4,7 +4,7 @@
         {
             "machine_queue_size":4,
             "batch_queue_size":5,
-            "scheduling_method":"FEE",
+            "scheduling_method":"MM",
             "fairness_factor": 0.5
             
         }        
