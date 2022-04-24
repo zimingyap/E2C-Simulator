@@ -330,7 +330,7 @@ class Machine(BaseMachine):
 
         s = '\n[ Task({:}), Machine({:}) ]: MISSED         @time({:3.3f})'.format(
             task.id, self.id, task.missed_time)
-        config.gui_task.append({"Task id":task.id,"Event Type":"MISSED", "Time":task.missed_time, "Machine": self.id})
+        # config.gui_task.append({"Task id":task.id,"Event Type":"MISSED", "Time":task.missed_time, "Machine": self.id})
         self.machine_log = {"Task id":task.id,"Event Type":"MISSED", "Time":task.missed_time, "Machine": self.id,"Type":'task'}
 
         config.log.write(s)
@@ -421,10 +421,11 @@ class Machine(BaseMachine):
             self.completed_tasks.append(task)
             self.stats['completed_tasks'] += 1
             self.stats[f'{task.type.name}-completed'] += 1
-        s = '\n[ Task({:}), Machine({:}) ]: {:}      @time({:3.3f})'.format(
+        # self.machine_log = {"ss":3,"Task id":task.id,"Event Type":task.status.name, "Time":task.completion_time, "Machine": self.id, "Type":'task'}
+        s = '\n[Task({:}), Machine({:}) ]: {:}      @time({:3.3f})'.format(
             task.id, self.id, task.status.name, task.completion_time)
-        config.gui_task.append({"Task id":task.id,"Event Type":task.status.name, "Time":task.completion_time, "Machine": self.id})
-        self.machine_log = {"Task id":task.id,"Event Type":task.status.name, "Time":task.completion_time, "Machine": self.id, "Type":'task'}
+        # config.gui_task.append({"Task id":task.id,"Event Type":task.status.name, "Time":task.completion_time, "Machine": self.id})
+        # self.machine_log = s
         
         config.log.write(s)
         if config.gui != 1:

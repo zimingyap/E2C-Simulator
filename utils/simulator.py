@@ -147,7 +147,7 @@ class Simulator(QObject):
             config.log.write(s)
             if config.gui != 1:
                 print(s)
-
+            # print(s)
             row =[config.time.gct(),config.available_energy]
 
             for machine in config.machines:                
@@ -159,26 +159,44 @@ class Simulator(QObject):
                 self.scheduler.batch_queue.put(task)
                 if config.gui == 1:
                     for i,v in enumerate(self.scheduler.batch_queue.list):
-                        self.first_gui_task = {"Task id": v.id, "Event Type": 'INCOMING',"Type":'task'}
-                        self.progress.emit(self.first_gui_task)
+                        self.progress.emit({"Task id": v.id, "Event Type": 'INCOMING',"Type":'task'})
                 # print(self.first_gui_task)
                 ### add to gui batch_queue
                 assigned_machine = self.scheduler.schedule() 
+                if config.gui == 1 and assigned_machine != None:
+                    time.sleep(self.timer)
+                    self.progress.emit({"Task id":task.id,"Event Type":event.event_type.name,"Time":event.time, "Machine": assigned_machine.id, "Type":'task', "FROM":169})
+                    time.sleep(self.timer)
+                    self.progress.emit({"Task id":task.id,"Event Type":task.status.name, "Time":task.completion_time, "Machine": assigned_machine.id, "Type":'task', "FROM":171})
+                    
 
             # Task is added to the scheduler batch_queue, if there are no available machines, 
             # the task will be drop
             elif event.event_type == EventTypes.DEFERRED:
-                self.scheduler.batch_queue.put(task)    
+                self.scheduler.batch_queue.put(task)   
+                if config.gui == 1:
+                    for i,v in enumerate(self.scheduler.batch_queue.list):
+                        self.first_gui_task = {"Task id": v.id, "Event Type": 'DEFFERED',"Type":'task'}
+                        self.progress.emit(self.first_gui_task) 
                 ### add to gui batch_queue
                 assigned_machine = self.scheduler.schedule()
                 if assigned_machine == None:
                     break
+                if config.gui == 1 :
+                    time.sleep(self.timer)
+                    self.progress.emit({"Task id":task.id,"Event Type":event.event_type.name,"Time":event.time, "Machine": assigned_machine.id, "Type":'task', "FROM":184})
+                    time.sleep(self.timer)
+                    self.progress.emit({"Task id":task.id,"Event Type":task.status.name, "Time":task.completion_time, "Machine": assigned_machine.id, "Type":'task', "FROM":186})
+                    
 
             # Task will be terminated upon completion
             elif event.event_type == EventTypes.COMPLETION:                
                 machine = task.assigned_machine
+                if config.gui == 1:
+                    time.sleep(self.timer)
+                    self.progress.emit({"Task id":task.id,"Event Type":event.event_type.name, "Time":task.completion_time, "Machine": machine.id, "Type":'task', "FROM":197})
                 ### add to gui batch_queue
-                machine.terminate(task)                
+                machine.terminate(task)      
                 self.scheduler.schedule()
 
             # elif event.event_type == EventTypes.OFFLOADED:
@@ -192,21 +210,22 @@ class Simulator(QObject):
             # Drop current running task 
             elif event.event_type == EventTypes.DROPPED_RUNNING_TASK:
                 machine = task.assigned_machine
+                if config.gui == 1 :
+                    time.sleep(self.timer)
+                    self.progress.emit({"Task id":task.id,"Event Type":event.event_type.name,"Time":event.time, "Type":'task', "FROM":214})
                 machine.drop()
                 self.scheduler.schedule() 
+                    # time.sleep(self.timer)
+                    # self.progress.emit({"Task id":task.id,"Event Type":task.status.name,"Time":event.time, "Machine": machine.id, "Type":'task'})
             if assigned_machine == None:
                 continue
-            # print("assigned machine {}".format(assigned_machine.id))
-            
-            if config.gui == 1 :
-                # config.gui_task.append({"Task id":task.id,"Event Type":event.event_type.name, "Time":event.time})
-                time.sleep(self.timer)
-                
-                self.progress.emit({"Task id":task.id,"Event Type":event.event_type.name, "Time":event.time, "Machine": assigned_machine.id, "Type":'task'})
-                if (assigned_machine.machine_log != self.check_sim):
-                    time.sleep(self.timer)
-                    self.progress.emit(assigned_machine.machine_log)
-                self.check_sim = assigned_machine.machine_log
+            # if config.gui == 1 :
+            #     time.sleep(self.timer)
+            #     self.progress.emit({"Task id":task.id,"Event Type":event.event_type.name,"Time":event.time, "Machine": assigned_machine.id, "Type":'task'})
+            #     if (assigned_machine.machine_log != self.check_sim):
+            #         time.sleep(self.timer)
+            #         self.progress.emit(assigned_machine.machine_log)
+            #     self.check_sim = assigned_machine.machine_log
         
             
                           

@@ -117,6 +117,7 @@ class ScrollMessageBox(QMessageBox):
         self.comboBox = QComboBox(self)
         self.comboBox.addItem("All")
         self.comboBox.addItem("Completed tasks")
+        self.comboBox.addItem("Not completed tasks")
         self.comboBox.addItem("Missed tasks")
         self.comboBox.addItem("Dropped tasks")
         self.comboBox.addItem("Machine logs")
@@ -132,7 +133,7 @@ class ScrollMessageBox(QMessageBox):
         self.layout().addWidget(scroll, 0, 0, 1, self.layout().columnCount())
         self.setStyleSheet("QScrollArea{min-width:900 px; min-height: 400px}")
         self.setWindowTitle(title)
-    
+
     def activated(self, index):
         self.clearLayout()
         if index == 0:
@@ -140,21 +141,26 @@ class ScrollMessageBox(QMessageBox):
                 self.lay.addWidget(QLabel("{}".format(item), self))
         elif index == 1:
             for item in self.task:
-                if 'Type' in item and item['Event Type'] == "COMPLETION":
+                if 'Type' in item and item['Event Type'] == "COMPLETED":
                     self.lay.addWidget(QLabel("{}".format(item), self))
         elif index == 2:
             for item in self.task:
-                if 'Type' in item and item['Event Type'] == 'MISSED':
+                if 'Type' in item and item['Event Type'] == "XCOMPLETED":
                     self.lay.addWidget(QLabel("{}".format(item), self))
+
         elif index == 3:
             for item in self.task:
-                if 'Type' in item and item['Event Type'] == 'DROPPED_RUNNING_TASK':
+                if 'Type' in item and item['Event Type'] == 'MISSED':
                     self.lay.addWidget(QLabel("{}".format(item), self))
         elif index == 4:
             for item in self.task:
+                if 'Type' in item and item['Event Type'] == 'DROPPED_RUNNING_TASK':
+                    self.lay.addWidget(QLabel("{}".format(item), self))
+        elif index == 5:
+            for item in self.task:
                 if 'Machine id' in item:
                     self.lay.addWidget(QLabel("{}".format(item), self))
-        
+
     def clearLayout(self):
         if self.lay is not None:
             while self.lay.count():
@@ -164,8 +170,23 @@ class ScrollMessageBox(QMessageBox):
                     widget.deleteLater()
                 else:
                     self.clearLayout(item.layout())
-  
-        
+
+
+class ScrollMessageBox1(QMessageBox):
+    def __init__(self, l, title, *args, **kwargs):
+        QMessageBox.__init__(self, *args, **kwargs)
+        scroll = QScrollArea(self)
+        scroll.setWidgetResizable(True)
+        self.content = QWidget()
+        scroll.setWidget(self.content)
+        lay = QVBoxLayout(self.content)
+        for k, v in l.items():
+            lay.addWidget(QLabel("{} : {}".format(k, v), self))
+        self.layout().addWidget(scroll, 0, 0, 1, self.layout().columnCount())
+        self.setStyleSheet("QScrollArea{min-width:900 px; min-height: 400px}")
+        self.setWindowTitle(title)
+
+
 class ScrollMessageBox2(QMessageBox):
     def __init__(self, l, title, *args, **kwargs):
         QMessageBox.__init__(self, *args, **kwargs)
@@ -174,11 +195,12 @@ class ScrollMessageBox2(QMessageBox):
         self.content = QWidget()
         scroll.setWidget(self.content)
         lay = QVBoxLayout(self.content)
-        for item in l:
-            lay.addWidget(QLabel("{}".format(item), self))
+        for k in l:
+            lay.addWidget(QLabel("{}".format(k), self))
         self.layout().addWidget(scroll, 0, 0, 1, self.layout().columnCount())
         self.setStyleSheet("QScrollArea{min-width:900 px; min-height: 400px}")
         self.setWindowTitle(title)
+
 
 class GUI(QMainWindow):
     def __init__(self):
@@ -220,13 +242,14 @@ class GUI(QMainWindow):
         self.gui_sim = GUI_SIM()
         self.layout.addWidget(self.statistic, 1)
         self.layout.addWidget(self.gui_sim, 6)
-        self.create_menu_bar()
+        # self.create_menu_bar()
         self.draw_batch_queue()
         self.scheduling()
         self.draw_machine()
         for i in range(len(self.m_coords)):
             b = QPushButton(self)
-            b.setGeometry(self.m_coords[i][0]+400, self.m_coords[i][1]+20, 70, 40)
+            b.setGeometry(self.m_coords[i][0]+400,
+                          self.m_coords[i][1]+20, 70, 40)
             b.setText("Details")
             b.setEnabled(False)
             self.machine_stats_btn.append(b)
@@ -235,7 +258,7 @@ class GUI(QMainWindow):
         for _ in range(self.no_of_task):
             a = QLabel(self)
             self.tasks.append(a)
-
+            
         self.main()
 
     def main(self):
@@ -246,9 +269,10 @@ class GUI(QMainWindow):
         high = 1
         self.path_to_result = f'{config.settings["path_to_output"]}/data/{workload}/{scheduling_method}'
         makedirs(self.path_to_result, exist_ok=True)
-        self.report_summary = open(f'{self.path_to_result}/results-summary.csv', 'w')
+        self.report_summary = open(
+            f'{self.path_to_result}/results-summary.csv', 'w')
         self.summary_header = ['Episode', 'total_no_of_tasks', 'mapped', 'cancelled', 'URG_missed', 'BE_missed',
-                          'Completion%', 'xCompletion%', 'totalCompletion%', 'consumed_energy%', 'energy_per_completion']
+                               'Completion%', 'xCompletion%', 'totalCompletion%', 'consumed_energy%', 'energy_per_completion']
         self.writer = csv.writer(self.report_summary)
         self.writer.writerow(self.summary_header)
         self.df_task_based_report = pd.DataFrame()
@@ -280,7 +304,7 @@ class GUI(QMainWindow):
             self.thread.started.connect(self.simulation.run)
 
             self.timer = 1000
-            
+
             self.startBtn = QPushButton("Start", self)
             self.startBtn.setGeometry(30, 750, 100, 50)
             self.startBtn.clicked.connect(lambda: self.thread.start())
@@ -289,11 +313,11 @@ class GUI(QMainWindow):
             self.pauseBtn.setText("Pause")
             self.pause = True
             self.pauseBtn.clicked.connect(lambda: self.pauseResumeBtn())
-            
+
             self.endBtn = QPushButton("End", self)
             self.endBtn.setGeometry(30, 850, 100, 50)
             self.endBtn.clicked.connect(lambda: self.endThread())
-            
+
             self.slider = QSlider(self)
             self.slider.setGeometry(200, 760, 200, 40)
             self.slider.setOrientation(Qt.Horizontal)
@@ -303,33 +327,34 @@ class GUI(QMainWindow):
             self.slider.setSliderPosition(self.timer)
             self.slider.valueChanged.connect(self.updateSlider)
             self.slider.valueChanged.connect(self.speed)
-            
+
             self.sliderLabel = QLabel(self)
             self.sliderLabel.setGeometry(400, 760, 200, 40)
             self.sliderLabel.setText("{:.1f}x".format(self.timer/1000))
-            
+
             self.finishSimBtn = QPushButton("Finish Simulation", self)
             self.finishSimBtn.setGeometry(200, 850, 100, 50)
             self.finishSimBtn.adjustSize()
-            self.finishSimBtn.clicked.connect(lambda: self.simulation.setTimer(0))
-            
+            self.finishSimBtn.clicked.connect(
+                lambda: self.simulation.setTimer(0))
+
             self.restartBtn = QPushButton("Restart", self)
             self.restartBtn.setGeometry(30, 900, 100, 50)
             self.restartBtn.setEnabled(False)
             self.restartBtn.clicked.connect(lambda: self.restart())
-            
+
             self.mDetails = QPushButton("Machine Details", self)
             self.mDetails.setGeometry(30, 950, 100, 50)
             self.mDetails.setEnabled(False)
             self.mDetails.adjustSize()
             self.mDetails.clicked.connect(lambda: self.createTable())
-            
+
             self.getLogBtn = QPushButton("Full log", self)
             self.getLogBtn.setGeometry(30, 1000, 100, 50)
             self.getLogBtn.setEnabled(False)
             self.getLogBtn.adjustSize()
             self.getLogBtn.clicked.connect(lambda: self.getLog())
-            
+
             self.thread.finished.connect(
                 lambda: self.simulation.report(self.path_to_result))
             self.thread.finished.connect(self.load_config)
@@ -337,24 +362,26 @@ class GUI(QMainWindow):
             self.thread.finished.connect(self.setEnabledEnd)
             self.thread.finished.connect(self.deleteTask)
             self.thread.finished.connect(self.getReport)
-            
+
     def getReport(self):
-        row, task_report = self.simulation.report(self.path_to_result)   
+        row, task_report = self.simulation.report(self.path_to_result)
         self.writer.writerows(row)
-        self.df_task_based_report = self.df_task_based_report.append(task_report, ignore_index=True)    
+        self.df_task_based_report = self.df_task_based_report.append(
+            task_report, ignore_index=True)
         self.report_summary.close()
-        self.df_task_based_report.to_csv(f'{self.path_to_result}/task_based_report.csv', index = False)
-        df_summary = pd.read_csv(f'{self.path_to_result}/results-summary.csv', 
-        usecols=['Completion%', 'xCompletion%', 'totalCompletion%',
-        'consumed_energy%','energy_per_completion'])
-        print('\n\n'+ 10*'*'+'  Average Results of Executing Episodes  '+10*'*')
+        self.df_task_based_report.to_csv(
+            f'{self.path_to_result}/task_based_report.csv', index=False)
+        df_summary = pd.read_csv(f'{self.path_to_result}/results-summary.csv',
+                                 usecols=['Completion%', 'xCompletion%', 'totalCompletion%',
+                                          'consumed_energy%', 'energy_per_completion'])
+        print('\n\n' + 10*'*'+'  Average Results of Executing Episodes  '+10*'*')
         print(df_summary.mean())
-        
+
     # Generate logs and display in a pop up window
     def getLog(self):
         result = ScrollMessageBox(self.finishedLog, "Full logs", None)
         result.exec_()
-        
+
     # Enable buttons
     def setEnabledEnd(self):
         self.mDetails.setEnabled(True)
@@ -387,18 +414,18 @@ class GUI(QMainWindow):
             self.pause = False
             self.pauseBtn.setText("Resume")
             self.simulation.simPause(0)
-            
+
         else:
             self.pause = True
             self.pauseBtn.setText("Pause")
             self.simulation.simPause(1)
-                        
+
     def deleteTask(self):
         for i in range(len(self.tasks)):
             if i not in self.deletedTask:
                 self.deletedTask.append(i)
                 self.tasks[i].deleteLater()
-            
+
     # Handling
     def handle_signal(self, d):
         print(d)
@@ -411,13 +438,8 @@ class GUI(QMainWindow):
 
     # Pop up message box to show statistics of each machine
     def create_machine_stat(self, i):
-        a = QMessageBox(self)
-        a.setText("{}".format(self.machine_stats[i]))
-        a.setWindowTitle("Machine {}".format(
-            self.machine_stats[i]['Machine id']))
-        a.setStandardButtons(QMessageBox.Ok)
-        a.setIcon(QMessageBox.Information)
-        a.exec()
+        msgBox = ScrollMessageBox1(self.machine_stats[i], "Machine log", None)
+        msgBox.exec_()
 
     # Create machine stat table
     def createTable(self):
@@ -428,7 +450,6 @@ class GUI(QMainWindow):
                                                    '%XCompletion', '# of %XCompletion', '#Missed URG', 'Missed BE', '%Energy', '%Wasted Energy'])
         self.tableWidget.resizeColumnsToContents()
         self.tableWidget.resizeRowsToContents()
-        # print(self.machine_stats)
         for i, v in enumerate(self.machine_stats):
             machineName = QTableWidgetItem(str(v['Machine']))
             completion = QTableWidgetItem(str(round(v['%Completion'], 2)))
@@ -524,16 +545,22 @@ class GUI(QMainWindow):
 
     # Controls the animation of the tasks
     def taskAnimation(self, x, y, d):
-        if d['Event Type'] != 'COMPLETED':
+        # # if d['Event Type'] != 'COMPLETION':
+        #     self.tasks[d["Task id"]].resize(35, 35)
+        #     self.tasks[d["Task id"]].setStyleSheet(
+        #         self.color[d["Task id"] % 5])
+        #     self.tasks[d["Task id"]].setText("{}".format(d["Task id"]))
+        #     self.tasks[d["Task id"]].setAlignment(Qt.AlignCenter)
+        #     self.anim = QPropertyAnimation(self.tasks[d["Task id"]], b"pos")
+        
+        # task arriving into batch queue, ready to go into scheduler
+        if d['Event Type'] == 'INCOMING':
             self.tasks[d["Task id"]].resize(35, 35)
             self.tasks[d["Task id"]].setStyleSheet(
                 self.color[d["Task id"] % 5])
             self.tasks[d["Task id"]].setText("{}".format(d["Task id"]))
             self.tasks[d["Task id"]].setAlignment(Qt.AlignCenter)
             self.anim = QPropertyAnimation(self.tasks[d["Task id"]], b"pos")
-
-        # task arriving into batch queue, ready to go into scheduler
-        if d['Event Type'] == 'INCOMING':
             for i, v in enumerate(self.batch_queue_availability):
                 if v == True:
                     self.anim.setDuration(self.timer/4)
@@ -566,7 +593,7 @@ class GUI(QMainWindow):
             coord_y = self.m_coords[d['Machine']][1]
             self.anim.setStartValue(QPoint(mq_coord_x + 3, mq_coord_y + 3))
             self.anim.setEndValue(QPoint(coord_x+20, coord_y+15))
-            self.anim.setDuration(self.timer/4)
+            self.anim.setDuration(self.timer/8)
         elif d['Event Type'] == "COMPLETION":
             coord_x = self.m_coords[d['Machine']][0]
             coord_y = self.m_coords[d['Machine']][1]
@@ -580,21 +607,26 @@ class GUI(QMainWindow):
             self.anim.stop()
             self.tasks[d["Task id"]].deleteLater()
             self.deletedTask.append(d["Task id"])
-        elif d['Event Type'] == "DROPPED_RUNNING_TASK":            
-            mq_coord_x = self.mq_coords[d['Machine']][0][0]
-            mq_coord_y = self.mq_coords[d['Machine']][0][1]
-            coord_x = self.m_coords[d['Machine']][0]
-            coord_y = self.m_coords[d['Machine']][1]
-            self.anim.setStartValue(QPoint(coord_x+20, coord_y+15))
-            self.anim.setEndValue(QPoint(mq_coord_x + 3, mq_coord_y + 3))
-            self.anim.setDuration(self.timer/4)
-
-        elif d['Event Type'] == "MISSED":
-            pass
+        # elif d['Event Type'] == "XCOMPLETED":
+        #     coord_x = self.m_coords[d['Machine']][0]
+        #     coord_y = self.m_coords[d['Machine']][1]
+        #     self.anim.setStartValue(QPoint(coord_x, coord_y))
+        #     self.anim.setEndValue(
+        #         QPoint(self.m_coords[d['Machine']][0]+100, self.m_coords[d['Machine']][1]))
+        #     self.anim.setDuration(self.timer/4)
+        #     self.finishedTasks[d['Machine']].append(d['Task id'])
+        #     self.finishedTasksLabel[d['Machine']].setText("Finished tasks: {}".format(
+        #     self.finishedTasks[d['Machine']][:-4:-1]))  # show last 3 element of finished tasks and reverse it
+        #     self.anim.stop()
+        #     self.tasks[d["Task id"]].deleteLater()
+        #     self.deletedTask.append(d["Task id"])
+        elif d['Event Type'] == "DROPPED_RUNNING_TASK":
+            self.tasks[d["Task id"]].deleteLater()
+            self.deletedTask.append(d["Task id"])
 
         elif d['Event Type'] == 'FINISH':
             self.thread.requestInterruption()
-            self.thread.wait()
+            self.thread.wait()  
             self.thread.quit()
         self.anim.start()
 
@@ -637,9 +669,12 @@ class GUI(QMainWindow):
             x_axis = 1100
             y_axis += y_axis_diff
             m = QPushButton(self)
+            mname = QLabel(self)
+            mname.move(x_axis+120, y_axis-60)
+            mname.resize(80, 40)
             m.move(x_axis+100, y_axis-20)
             m.resize(80, 80)
-            m.setText("{}".format(machine_name[i]))
+            mname.setText("{}".format(machine_name[i]))
             self.m_coords[i] = [x_axis+100, y_axis-20]
             if machine_name[i] == 'cpu':
                 m.setStyleSheet("""
@@ -658,9 +693,9 @@ class GUI(QMainWindow):
                   }
                """)
             self.machineBtn.append(m)
-            self.machineBtn[i].clicked.connect(lambda checked, a=i: self.getMachineDetail(a))
-            
-            # m.setAlignment(Qt.AlignCenter)
+            self.machineBtn[i].clicked.connect(
+                lambda checked, a=i: self.getMachineDetail(a))
+
             mq_c = []
             mq_a = []
             for _ in range(machine_queue_size):
@@ -692,7 +727,7 @@ class GUI(QMainWindow):
         machineDetail = [machineId, machineType, machineSpecs, machineQSize]
         msgBox = ScrollMessageBox2(machineDetail, "Machine detail", None)
         msgBox.exec_()
-        
+
     # Draw machine queue
     def draw_machine_queue(self, x, y):
         mq = QLabel(self)
@@ -704,11 +739,13 @@ class GUI(QMainWindow):
         qp = QPainter()
         qp.begin(self)
         self.bq_sch_Lines(qp)
-        self.sch_m_Lines(qp)
+        self.sch_mq_Lines(qp)
+        self.mq_m_Lines(qp)
+
         qp.end()
 
     # draw line from batch queue to scheduler
-    def bq_sch_Lines(self, qp):
+    def sch_mq_Lines(self, qp):
         pen = QPen(Qt.black, 2, Qt.DashLine)
         sch_x = 500+85
         sch_y = 580+41
@@ -721,7 +758,7 @@ class GUI(QMainWindow):
             qp.drawLine(sch_x, sch_y, m_x, m_y)
 
     # draw lines from scheduler to machine queue
-    def sch_m_Lines(self, qp):
+    def bq_sch_Lines(self, qp):
         pen = QPen(Qt.black, 2, Qt.DashLine)
         bq_x = self.bq_coords[0][0] + 41  # first batch queue coordinates
         bq_y = self.bq_coords[0][1] + 21  # first batch queue coordinates
@@ -730,13 +767,27 @@ class GUI(QMainWindow):
         qp.setPen(pen)
         qp.drawLine(bq_x, bq_y, sch_x, sch_y)
 
+    # draw lines from machine queue to machine
+    def mq_m_Lines(self, qp):
+        pen = QPen(Qt.black, 2, Qt.DashLine)
+
+        for i in range(len(self.mq_coords)):
+            # first machine queue coordinates
+            mq_x = self.mq_coords[i][0][0]+41
+            # first machine queue coordinates
+            mq_y = self.mq_coords[i][0][1] + 21
+            m_x = self.m_coords[i][0] + 21
+            m_y = self.m_coords[i][1] + 41
+
+            qp.setPen(pen)
+            qp.drawLine(mq_x, mq_y, m_x, m_y)
+
     # Used to restart the simulator
     def restart(self):
         QCoreApplication.quit()
         QProcess.startDetached(sys.executable, sys.argv)
 
-
-    def load_config(self,path_to_config='./api.json'):
+    def load_config(self, path_to_config='./api.json'):
         try:
             f = open(path_to_config)
         except FileNotFoundError as fnf_err:

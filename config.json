@@ -4,7 +4,7 @@
         {
             "machine_queue_size":4,
             "batch_queue_size":5,
-            "scheduling_method":"MM",
+            "scheduling_method":"EE",
             "fairness_factor": 0.5
             
         }        
@@ -13,7 +13,7 @@
         {
             "path_to_output":"./output",
             "path_to_workload":"./workload",
-            "gui":1
+            "gui":0
         }        
     ],
 

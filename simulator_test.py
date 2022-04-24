@@ -24,7 +24,6 @@ class TestConfig(unittest.TestCase):
     def test_run(self):
         sim = Simulator('0-0',0)
         sim.set_scheduling_method()
-        # sim.run()
 
 
 if __name__ == '__main__':
