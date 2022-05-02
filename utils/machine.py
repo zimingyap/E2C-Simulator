@@ -53,7 +53,10 @@ class Machine(BaseMachine):
         raise NotImplementedError
 
     def reset(self):
-        """Reset the machine statistics to 0
+        """
+        The function resets the status of the machine to idle, clears the queue, clears the running
+        task, clears the completion times, sets the idle time to the current time, clears the completed
+        tasks, clears the xcompleted tasks, clears the missed tasks, and resets the stats
         """
         self.status = MachineStatus.IDLE
         self.queue = Queue(maxsize=self.queue_size)

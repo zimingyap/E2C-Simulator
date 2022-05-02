@@ -1,5 +1,4 @@
 import sys
-import os
 import json
 from PyQt5.QtWidgets import (
     QWidget,
@@ -7,7 +6,6 @@ from PyQt5.QtWidgets import (
     QLabel,
     QFrame,
     QMainWindow,
-    QMenu,
     QPushButton,
     QVBoxLayout,
     QHBoxLayout,
@@ -17,7 +15,6 @@ from PyQt5.QtWidgets import (
     QTableWidget,
     QTableWidgetItem,
     QHeaderView,
-    QAction,
     QScrollArea,
     QComboBox
 )
@@ -41,7 +38,8 @@ from utils.simulator import Simulator
 from utils.machine import Machine
 import utils.config as config
 
-
+# This class holds the code for statistic box on the top. The stats are arranged vertically with QVBoxLayout
+# and each stat is made from QLabel
 class Statistic(QFrame):
     def __init__(self):
         super().__init__()
@@ -101,11 +99,10 @@ class Statistic(QFrame):
         self.layout.setContentsMargins(0, 0, 0, 0)
         self.layout.setSpacing(0)
 
-
+# This class sets the proportion of the statistic class and the main class
 class GUI_SIM(QFrame):
     def __init__(self):
         super().__init__()
-        # self.setStyleSheet("border:1px solid;")
         self.layout = QHBoxLayout()
         self.setLayout(self.layout)
 
@@ -201,7 +198,7 @@ class ScrollMessageBox2(QMessageBox):
         self.setStyleSheet("QScrollArea{min-width:900 px; min-height: 400px}")
         self.setWindowTitle(title)
 
-
+# This is the main class where all the GUI appears
 class GUI(QMainWindow):
     def __init__(self):
         super(GUI, self).__init__()
@@ -220,18 +217,13 @@ class GUI(QMainWindow):
         self.finishedLog = []
         self.finishedTasks = []
         self.finishedTasksLabel = []
-        # self.completedTask = []
-        # self.missedTask = []
-        # self.droppedTask = []
         self.deletedTask = []
         self.machine_queue_size = config.machine_queue_size
         self.initUI()
 
     def initUI(self):
-        # self.setGeometry(0, 0, 2560, 1440)
-        # self.showFullScreen()
         self.move(0, 0)
-        self.setMinimumSize(2500, 1200)
+        self.setMinimumSize(1920, 1080)
         self.setWindowTitle("Simulator")
         self.group = QSequentialAnimationGroup(self)
         self.central_widget = QWidget()
@@ -240,9 +232,8 @@ class GUI(QMainWindow):
         self.central_widget.setLayout(self.layout)
         self.statistic = Statistic()
         self.gui_sim = GUI_SIM()
-        self.layout.addWidget(self.statistic, 1)
+        self.layout.addWidget(self.statistic, 2)
         self.layout.addWidget(self.gui_sim, 6)
-        # self.create_menu_bar()
         self.draw_batch_queue()
         self.scheduling()
         self.draw_machine()
@@ -364,6 +355,9 @@ class GUI(QMainWindow):
             self.thread.finished.connect(self.getReport)
 
     def getReport(self):
+        """
+        It takes the results of the simulation and writes them to a csv file
+        """
         row, task_report = self.simulation.report(self.path_to_result)
         self.writer.writerows(row)
         self.df_task_based_report = self.df_task_based_report.append(
@@ -379,11 +373,18 @@ class GUI(QMainWindow):
 
     # Generate logs and display in a pop up window
     def getLog(self):
+        """
+        It opens a new window with a scrollable text box that contains the contents of the finishedLog
+        variable
+        """
         result = ScrollMessageBox(self.finishedLog, "Full logs", None)
         result.exec_()
 
     # Enable buttons
     def setEnabledEnd(self):
+        """
+        It enables the buttons in the GUI
+        """
         self.mDetails.setEnabled(True)
         self.restartBtn.setEnabled(True)
         self.getLogBtn.setEnabled(True)
@@ -393,23 +394,39 @@ class GUI(QMainWindow):
 
     # End the thread/simulation
     def endThread(self):
+        """
+        It sets a boolean to false, which is checked in the thread, and then it terminates the thread
+        """
         self.simulation.threadController = False
         self.thread.terminate()
         self.thread.wait()
-        # self.thread.exit()
 
     # Control the speed of the simulation, this function calls a function in simulator.py
     def speed(self, value):
+        """
+        The function speed() takes in a value and sets the timer to that value
+        
+        :param value: The value of the slider
+        """
         self.timer = value
         self.simulation.setTimer(value/1000)
 
     # Update the slider speed text
     def updateSlider(self, value):
+        """
+        The function takes in a value, and if the value is not 0, it sets the text of the sliderLabel to
+        the value divided by 1000, rounded to one decimal place.
+        
+        :param value: The value of the slider
+        """
         if value != 0:
             self.sliderLabel.setText("{:.1f}x".format(1000/value, "2f"))
 
     # Puase the simulation
     def pauseResumeBtn(self):
+        """
+        If the simulation is paused, resume it. If the simulation is not paused, pause it.
+        """
         if self.pause:
             self.pause = False
             self.pauseBtn.setText("Resume")
@@ -421,6 +438,9 @@ class GUI(QMainWindow):
             self.simulation.simPause(1)
 
     def deleteTask(self):
+        """
+        It deletes the task from the list of tasks and deletes the task from the GUI
+        """
         for i in range(len(self.tasks)):
             if i not in self.deletedTask:
                 self.deletedTask.append(i)
@@ -428,6 +448,12 @@ class GUI(QMainWindow):
 
     # Handling
     def handle_signal(self, d):
+        """
+        It takes a dictionary as an argument, and if the dictionary contains the key 'Type', it calls
+        the function taskAnimation() with the arguments 120, 520, and the dictionary
+        
+        :param d: the data that is being sent from the server
+        """
         print(d)
         self.finishedLog.append(d)
         if 'Type' in d:
@@ -438,11 +464,19 @@ class GUI(QMainWindow):
 
     # Pop up message box to show statistics of each machine
     def create_machine_stat(self, i):
+        """
+        It creates a message box with a scroll bar that displays the contents of a list
+        
+        :param i: the index of the machine in the list of machines
+        """
         msgBox = ScrollMessageBox1(self.machine_stats[i], "Machine log", None)
         msgBox.exec_()
 
     # Create machine stat table
     def createTable(self):
+        """
+        Creates a table with the machine stat stable
+        """
         self.tableWidget = QTableWidget()
         self.tableWidget.setRowCount(len(self.machine_stats)+1)
         self.tableWidget.setColumnCount(len(self.machine_stats[0]))
@@ -488,23 +522,12 @@ class GUI(QMainWindow):
             QHeaderView.ResizeToContents)
         # self.tableWidget.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
         self.tableWidget.show()
-    # Create menu bar on top
 
-    def create_menu_bar(self):
-        menuBar = self.menuBar()
-        # Creating menus using a QMenu object
-        fileMenu = QMenu("&File", self)
-        editMenu = QMenu("&Edit", self)
-        helpMenu = QMenu("&Help", self)
-        menuBar.addMenu(fileMenu)
-        menuBar.addMenu(editMenu)
-        menuBar.addMenu(helpMenu)
-
-        quitAction = QAction("Quit", self)
-        fileMenu.addAction(quitAction)
     # Set the stats of machines after simulation ends
-
     def statistics_info(self):
+        """
+        It sets the text of a bunch of QLabels to the values of a bunch of keys in a dictionary
+        """
         self.statistic.TotalCompletion.setText("%Total Completion: {:.3f}".format(
             self.data['statistics']['%Total Completion']))
         self.statistic.TotalxCompletion.setText("%Total xCompletion: {:.3f}".format(
@@ -522,6 +545,10 @@ class GUI(QMainWindow):
 
     # draws batch queue on the left side
     def draw_batch_queue(self):
+        """
+        It draws the batch queue, and the number of boxes drawn depends on the value of
+        the variable batch_queue_size
+        """
         overload = None
         if (config.batch_queue_size <= 4):
             batch_queue_size = config.batch_queue_size
@@ -545,6 +572,12 @@ class GUI(QMainWindow):
 
     # Controls the animation of the tasks
     def taskAnimation(self, x, y, d):
+        """
+        This function controls the animation of the tasks
+        :param x: the x-coordinate of the task
+        :param y: the y-coordinate of the task
+        :param d: dictionary of the event
+        """
         # # if d['Event Type'] != 'COMPLETION':
         #     self.tasks[d["Task id"]].resize(35, 35)
         #     self.tasks[d["Task id"]].setStyleSheet(
@@ -632,6 +665,9 @@ class GUI(QMainWindow):
 
     # Draw the scheduler in the middle
     def scheduling(self):
+        """
+        It creates a label that displays the scheduling method that is currently being used
+        """
         scheduling_method = config.scheduling_method
         round_scheduler = QLabel(self)
         round_scheduler.move(500, 580)
@@ -649,6 +685,9 @@ class GUI(QMainWindow):
 
     # Draw the machines on the right side
     def draw_machine(self):
+        """
+        It draws the machines and their queues
+        """
         machine_name = []
         config.init()
         self.machineBtn = []
@@ -730,12 +769,25 @@ class GUI(QMainWindow):
 
     # Draw machine queue
     def draw_machine_queue(self, x, y):
+        """
+        It creates a QLabel object, sets its frame shape to a box, and sets its geometry to a specific x
+        and y coordinate
+        
+        :param x: x-coordinate of the top left corner of the box
+        :param y: y-coordinate of the top left corner of the box
+        """
         mq = QLabel(self)
         mq.setFrameShape(QFrame.Box)
         mq.setGeometry(x, y, 41, 41)
 
     # Initialize QPainter for drawing line
     def paintEvent(self, e):
+        """
+        The function is called when the window is resized, and it draws the lines that connect the three
+        widgets
+        
+        :param e: QPaintEvent
+        """
         qp = QPainter()
         qp.begin(self)
         self.bq_sch_Lines(qp)
@@ -746,6 +798,11 @@ class GUI(QMainWindow):
 
     # draw line from batch queue to scheduler
     def sch_mq_Lines(self, qp):
+        """
+        It draws a line from the scheduling queue to the first machine queue
+        
+        :param qp: QPainter object
+        """
         pen = QPen(Qt.black, 2, Qt.DashLine)
         sch_x = 500+85
         sch_y = 580+41
@@ -759,6 +816,11 @@ class GUI(QMainWindow):
 
     # draw lines from scheduler to machine queue
     def bq_sch_Lines(self, qp):
+        """
+        Draws a line from the batch queue to the scheduler
+        
+        :param qp: the QPainter object
+        """
         pen = QPen(Qt.black, 2, Qt.DashLine)
         bq_x = self.bq_coords[0][0] + 41  # first batch queue coordinates
         bq_y = self.bq_coords[0][1] + 21  # first batch queue coordinates
@@ -769,6 +831,11 @@ class GUI(QMainWindow):
 
     # draw lines from machine queue to machine
     def mq_m_Lines(self, qp):
+        """
+        Draws a line from the machine queue to the machine
+        
+        :param qp: the QPainter object
+        """
         pen = QPen(Qt.black, 2, Qt.DashLine)
 
         for i in range(len(self.mq_coords)):
@@ -784,10 +851,19 @@ class GUI(QMainWindow):
 
     # Used to restart the simulator
     def restart(self):
+        """
+        It quits the current application and starts a new one
+        """
         QCoreApplication.quit()
         QProcess.startDetached(sys.executable, sys.argv)
 
     def load_config(self, path_to_config='./api.json'):
+        """
+        It opens a file, reads the contents, closes the file, and then loads the contents into a json
+        object
+        
+        :param path_to_config: The path to the config file, defaults to ./api.json (optional)
+        """
         try:
             f = open(path_to_config)
         except FileNotFoundError as fnf_err:
