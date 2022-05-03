@@ -113,10 +113,10 @@ class ScrollMessageBox(QMessageBox):
         self.task = l
         self.comboBox = QComboBox(self)
         self.comboBox.addItem("All")
+        self.comboBox.addItem("Incoming tasks")
+        self.comboBox.addItem("Arriving tasks")
+        self.comboBox.addItem("Running tasks")
         self.comboBox.addItem("Completed tasks")
-        self.comboBox.addItem("Not completed tasks")
-        self.comboBox.addItem("Missed tasks")
-        self.comboBox.addItem("Dropped tasks")
         self.comboBox.addItem("Machine logs")
         self.comboBox.activated.connect(self.activated)
         scroll = QScrollArea(self)
@@ -138,22 +138,26 @@ class ScrollMessageBox(QMessageBox):
                 self.lay.addWidget(QLabel("{}".format(item), self))
         elif index == 1:
             for item in self.task:
-                if 'Type' in item and item['Event Type'] == "COMPLETED":
+                if 'Type' in item and item['Event Type'] == "INCOMING":
                     self.lay.addWidget(QLabel("{}".format(item), self))
         elif index == 2:
             for item in self.task:
-                if 'Type' in item and item['Event Type'] == "XCOMPLETED":
+                if 'Type' in item and item['Event Type'] == "ARRIVING":
                     self.lay.addWidget(QLabel("{}".format(item), self))
 
         elif index == 3:
             for item in self.task:
-                if 'Type' in item and item['Event Type'] == 'MISSED':
+                if 'Type' in item and item['Event Type'] == 'RUNNING':
                     self.lay.addWidget(QLabel("{}".format(item), self))
         elif index == 4:
             for item in self.task:
-                if 'Type' in item and item['Event Type'] == 'DROPPED_RUNNING_TASK':
+                if 'Type' in item and item['Event Type'] == 'COMPLETION':
                     self.lay.addWidget(QLabel("{}".format(item), self))
         elif index == 5:
+            for item in self.task:
+                if 'Type' in item and item['Event Type'] == 'DROPPED_RUNNING_TASK':
+                    self.lay.addWidget(QLabel("{}".format(item), self))
+        elif index == 6:
             for item in self.task:
                 if 'Machine id' in item:
                     self.lay.addWidget(QLabel("{}".format(item), self))
