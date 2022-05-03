@@ -27,11 +27,12 @@ class EventQueue:
     event_list = []
 
     def add_event(self, event):
-        """Insert an event into the event_list.
-
-        Args:
-            event (Event): Event class
-        """        
+        """
+        **add_event** takes an event object and inserts it into the event_list
+        
+        :param event: The event to be added to the event list
+        """
+               
         # Insert an event into the event_list.
         if isinstance(event, Event):
             heapq.heappush(self.event_list, event)
@@ -39,31 +40,29 @@ class EventQueue:
             raise TypeError
 
     def get_first_event(self):
-        """It returns the root of event_list which is the event with    smallest time.
-
-        Returns:
-            event: first event in event_list
-        """        
-        # it returns the root of event_list which is the event with 
-        # smallest time.
-
+        """
+        It returns the event with the smallest time
+        :return: The event with the smallest time.
+        """
         if self.event_list:  # it checks that event_list is non-empty
             return heapq.heappop(self.event_list)
         else:
             return Event(None, None, None)
 
     def remove(self, event):
-        """It removes the event from the event_list. Then, the resulted event_list is heapified again.
-
-        Args:
-            event (Event): Event class
-        """        
-        # It removes the event from the event_list. Then, the resulted
-        # event_list is heapified again. 
+        """
+        It removes the event from the event_list. Then, the resulted
+        event_list is heapified again.
+        
+        :param event: The event to be removed
+        """
         print(self.event_list)
         print('\n\n\n')
         self.event_list.remove(event)
         heapq.heapify(self.event_list)
     
     def reset(self):
+        """
+        It resets the event list to an empty list.
+        """
         self.event_list = []

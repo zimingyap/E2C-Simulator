@@ -23,38 +23,37 @@ class Queue:
         self.list = []
         
     def qsize(self):
-        """Return the size of the queue
-
-        Returns:
-            int: size of the queue
-        """        
+        """
+        The function qsize() returns the length of the list
+        :return: The length of the list.
+        """
+              
         return len(self.list)
 
     def empty(self):
-        """Check if queue is empty or not
-
-        Returns:
-            bool
-        """        
+        """
+        If the list is empty, return True, otherwise return False
+        :return: The boolean value of the list.
+        """
+            
         return not bool(self.list)
     
     def full(self):
-        """Check if queue is full or not
-
-        Returns:
-            _type_: _description_
-        """        
+        """
+        Returns True if the queue is full, False otherwise
+        :return: The return value is a boolean value.
+        """
+        
         return self.qsize() == self.maxsize
     
     def put(self, item):
-        """Append an item inside the queue
-
-        Args:
-            item (Any): Any
-
-        Raises:
-            FullQueueError: _description_
-        """        
+        """
+        If the queue is full, raise a FullQueueError exception with the item as the argument, otherwise
+        append the item to the list
+        
+        :param item: the item to be added to the queue
+        """
+        
         try:
             if self.full():
                 raise FullQueueError(item)
@@ -65,14 +64,13 @@ class Queue:
             sys.exit()
     
     def get(self, index = 0):    
-        """Get an item from queue based on index
-
-        Args:
-            index (int, optional): _description_. Defaults to 0.
-
-        Returns:
-            Any: item in the queue
-        """                    
+        """
+        If the index is out of range, print the error message and exit the program
+        
+        :param index: The index of the item to be removed, defaults to 0 (optional)
+        :return: The value of the item at the index specified.
+        """
+                           
         try:
             self.list[index]                   
         except IndexError as val_err:
@@ -84,11 +82,12 @@ class Queue:
         
     
     def remove(self, item):
-        """Remove an item in the queue
-
-        Args:
-            item (Any): Any
-        """        
+        """
+        The function removes an item from the list
+        
+        :param item: The item to be removed from the list
+        """
+        
         try:
             index = self.list.index(item)            
         except ValueError as err:

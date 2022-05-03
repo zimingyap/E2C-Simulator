@@ -61,7 +61,7 @@ class Machine(BaseMachine):
         self.status = MachineStatus.IDLE
         self.queue = Queue(maxsize=self.queue_size)
         self.running_task = []
-        '''zm'''
+
         self.completion_times = [-1] * (self.queue_size+1)
 
         self.idle_time = config.time.gct()
@@ -75,12 +75,16 @@ class Machine(BaseMachine):
     def is_working(self):
         """Check if there are any running tasks in the machine
 
-        Returns:
-            bool: True if there are any tasks in running_task, else False
+        :return: A boolean value.
         """
         return bool(self.running_task)
 
     def select(self):
+        """
+        If the queue is empty, the machine is idle, and we return None. Otherwise, we get the next task
+        from the queue and return it
+        :return: The task that is being returned is the task that is being removed from the queue.
+        """
         if self.queue.empty():
             self.status = MachineStatus.IDLE
             return None
@@ -90,14 +94,13 @@ class Machine(BaseMachine):
             return task
 
     def provisional_map(self, task):
-        """Get the estimated completion time.
-
-        Args:
-            task (Task): a Task class
-
-        Returns:
-            float: estimated time
         """
+        > The function returns the estimated completion time of a task if it is admitted to the machine
+        
+        :param task: the task to be mapped
+        :return: The estimated completion time of the task
+        """
+        
         if self.is_working():
             running_task = self.running_task[0]
             # nxt_start_time = start time for the next task
@@ -132,17 +135,14 @@ class Machine(BaseMachine):
         return estimated_ct
 
     def get_completion_time(self, task):
-        """Get the completion time of a task, the total running time and Completion status
-
-        Args:
-            task (Task): a Task class
-
-        Returns:
-            float: completion time
-            float: running time
-            bool: task's completion status
-
         """
+        If the task is completed, return the completion time, running time, and True. Otherwise,
+        return the completion time, running time, and False
+        
+        :param task: The task to be executed
+        :return: The completion time, running time, and whether or not the task was completed.
+        """
+        
         start_time = self.idle_time if self.is_working() else config.time.gct()
 
         completion_time = start_time + task.execution_time[f'{self.type.name}-{self.replica_id}']
@@ -162,6 +162,13 @@ class Machine(BaseMachine):
         return completion_time, running_time, completed
 
     def admit(self, task):        
+        """
+        If the queue is not full, add the task to the queue, update the stats, and if there is no
+        running task, select the next task and execute it
+        
+        :param task: the task to be admitted
+        :return: The gain and loss of the task
+        """
         if not self.queue.full():
             self.queue.put(task)
             task.status = TaskStatus.PENDING
@@ -191,6 +198,12 @@ class Machine(BaseMachine):
                 self.cancel(task)
 
     def execute(self, task):
+        """
+        Executes the task
+        
+        :param task: The task that is being executed
+        :return: The time the machine spent when it ran the task
+        """
         try:
             assert(
                 not self.running_task), f'ERROR[machine.py -> execute()]: The machine {self.id} is already running a task'
@@ -260,15 +273,17 @@ class Machine(BaseMachine):
         return running_time
 
     def gain(self, task, completion_time):
-        """_summary_
-
-        Args:
-            task (_type_): _description_
-            completion_time (_type_): _description_
-
-        Returns:
-            _type_: _description_
-        """        
+        """
+        If the task is best effort, the gain is 2.5 if the task is completed before the deadline minus
+        the devaluation window, and the gain is linearly decreasing from 2.5 to 0 as the completion time
+        approaches the deadline. If the task is urgent, the gain is 100 if the task is completed before
+        the deadline, and the gain is -100 if the task is completed after the deadline
+        
+        :param task: the task object
+        :param completion_time: the time at which the task is completed
+        :return: The gain of the task.
+        """
+        
         delta = task.deadline
         if task.urgency == UrgencyLevel.BESTEFFORT:
             w = task.devaluation_window
@@ -290,6 +305,14 @@ class Machine(BaseMachine):
         return g
 
     def loss(self, task, running_time):
+        """
+        The loss function is a function of the energy consumption of the task and the urgency of the
+        task
+        
+        :param task: the task object
+        :param running_time: the time it takes to run the task
+        :return: The loss function is being returned.
+        """
         energy_consumption = running_time * self.specs['power']  # joule
 
         if task.urgency == UrgencyLevel.BESTEFFORT:
@@ -303,11 +326,14 @@ class Machine(BaseMachine):
         return l
 
     def drop(self):
-        """Drop the current running task
-
-        Returns:
-            int: energy consumption
-        """        
+        """
+        The function is called when a task is dropped from the machine. The task is removed from the
+        running task list and the machine is set to IDLE. The energy consumption is calculated and the
+        task's energy usage and wasted energy is updated. The task is then added to the missed task
+        list. If the queue is not empty, the next task is selected and executed
+        :return: The energy consumption of the task that was dropped.
+        """
+              
         task = self.running_task.pop()
         task.status = TaskStatus.MISSED
         # Machine set to IDLE after task is pop
@@ -342,11 +368,12 @@ class Machine(BaseMachine):
         return energy_consumption
 
     def cancel(self, task):
-        """Cancel a task
-
-        Args:
-            task (Task): a Task class
-        """        
+        """
+        The function cancels the task and updates the idle time of the machine
+        
+        :param task: The task to be cancelled
+        """
+          
         try:
             index = self.queue.list.index(task)
         except ValueError as err:
@@ -387,14 +414,14 @@ class Machine(BaseMachine):
         config.log.write(s)
 
     def terminate(self, task):
-        """Terminate a task, usually used when a task finished its job
-
-        Args:
-            task (Task): Task class
-
-        Returns:
-            int: energy consumption
         """
+        The function terminates a task and updates the machine status, energy consumption, task status,
+        and task completion time.
+        
+        :param task: The task to be executed
+        :return: The energy consumption of the task.
+        """
+        
         self.running_task.pop()
 
         self.status = MachineStatus.IDLE
@@ -441,6 +468,9 @@ class Machine(BaseMachine):
         return energy_consumption
 
     def shutdown(self):
+        """
+        It sets the status of the machine to OFF.
+        """
         self.status = MachineStatus.OFF
 
     def info(self):

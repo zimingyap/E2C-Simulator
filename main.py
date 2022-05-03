@@ -7,7 +7,7 @@ from os import makedirs
 from utils.simulator import Simulator
 from utils.machine import Machine
 import utils.config as config
-from zm import *
+from gui import *
 import sys
 
 config.init()

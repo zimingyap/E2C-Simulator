@@ -230,18 +230,7 @@ class Simulator(QObject):
             
                           
     
-    # This function is used to pass necessary information for GUI. 
-    # Create a json file to store the data and pass it to GUI like API
-    def monitor(self):
-        # task = config.gui_task
-        data = {}
-        data['no_of_machine'] = config.no_of_machines
-        data['scheduler'] = config.scheduling_method
-        data['batch_queue_size'] = config.batch_queue_size
-        data['machine_queue_size'] = config.machine_queue_size
-        data['statistics'] = self.gui_statistic
-        with open('api.json','w') as outfile:
-            json.dump(data, outfile)
+   
 
     def report(self, path_to_report):        
         """Generate a report to the path
@@ -401,6 +390,21 @@ class Simulator(QObject):
         
     def simPause(self,value):
         self.threadController = value
+        
+     # This function is used to pass necessary information for GUI. 
+    # Create a json file to store the data and pass it to GUI like API
+    def monitor(self):
+        """
+        It writes the current state of the system to a json file
+        """
+        data = {}
+        data['no_of_machine'] = config.no_of_machines
+        data['scheduler'] = config.scheduling_method
+        data['batch_queue_size'] = config.batch_queue_size
+        data['machine_queue_size'] = config.machine_queue_size
+        data['statistics'] = self.gui_statistic
+        with open('api.json','w') as outfile:
+            json.dump(data, outfile)
 
 class WorkerThread(QThread):
     update_progress = pyqtSignal(dict)

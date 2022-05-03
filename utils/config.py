@@ -8,17 +8,14 @@ Description:
 """
 import json
 import sys
-# added traceback by ziming
+
 import traceback
 
 from utils.time import Time
 from utils.event_queue import EventQueue
 from utils.task_type import TaskType, UrgencyLevel
 from utils.machine_type import MachineType
-# from . import event_queue
-# import time as Time
-# import task_type as TaskType
-# import machine_type as MachineType
+
 '''
 Begin code changes by Ziming
 if json file wrong format return error
@@ -26,14 +23,14 @@ if json file wrong format return error
 
 
 def load_config(path_to_config='./config.json'):
-    """Load config.json data
-
-    Args:
-        path_to_config (str, optional): _description_. Defaults to './config.json'.
-
-    Returns:
-        json: dictionary of configurations
     """
+    It opens a file, reads the contents, closes the file, and then loads the contents into a Python
+    dictionary.
+    
+    :param path_to_config: The path to the config file, defaults to ./config.json 
+    :return: A dictionary of the config.json file
+    """
+
     try:
         f = open(path_to_config)
     except FileNotFoundError as fnf_err:
@@ -45,24 +42,17 @@ def load_config(path_to_config='./config.json'):
     return data
 
 
-'''
-Begin code changes by Ziming
-- Adding input validation
-- Check if there are duplicate ids (??)
-'''
 
 
 def create_task_types(task_types_info):
-    """Create task types from config.json
-
-    Args:
-        task_types_info (list): Description of tasks
-
-    Returns:
-        list: TaskType
-        list: task_type_names
-
     """
+    It takes a list of dictionaries as input, and returns a list of TaskType objects and a list of task
+    type names.
+    
+    :param task_types_info: a list of dictionaries that contains task type infos
+    :return: A list of task types and a list of task type names
+    """
+    
 
     task_types = []
     task_type_names = []
@@ -104,16 +94,14 @@ Adding input validation
 
 
 def create_machine_types(machines_info):
-    """Create machine types from config.json
-
-    Args:
-        machines_info (dict)): machine's info (type id, name, power, idle power, replicas)
-
-    Returns:
-        list: MachineType
-        list: machine_type_names
-        int: number of machines        
     """
+    It takes a list of dictionaries of machines info as input, and returns a list of MachineType objects, a list of
+    machine type names, and the total number of machines.
+    
+    :param machines_info: This is the list of machine types that you want to use
+    :return: A list of machine types, a list of machine type names, and the number of machines.
+    """
+   
     machine_types = []
     machine_type_names = []
     no_of_machines = 0
@@ -142,17 +130,13 @@ def create_machine_types(machines_info):
 
 
 def find_task_type(task_type_id):
-    """Find task type based on id
-
-    Args:
-        task_type_id (int): _description_
-
-    Raises:
-        Exception: _description_
-
-    Returns:
-        task_type: TaskType(id, name, urgency, deadline)
     """
+    It loops through the list of task types and returns the task type that matches the task type id
+    
+    :param task_type_id: The id of the task type
+    :return: A list of task types
+    """
+    
     try:
         for task_type in task_types:
             if task_type.id == task_type_id:
