@@ -204,7 +204,7 @@ class GUI(QMainWindow):
         super(GUI, self).__init__()
         self.color = ["background-color:lightgreen", "background-color:lightblue",
                       "background-color:lightsalmon", "background-color:lightpink", "background-color:lightgoldenrodyellow"]
-        self.no_of_task = 150  # need to read from somewhere
+        self.no_of_task = 150  # maximum number of tasks that the GUI will run
         self.tasks = []
         self.machine_stats = []
         self.machine_stats_btn = []
@@ -578,14 +578,7 @@ class GUI(QMainWindow):
         :param y: the y-coordinate of the task
         :param d: dictionary of the event
         """
-        # # if d['Event Type'] != 'COMPLETION':
-        #     self.tasks[d["Task id"]].resize(35, 35)
-        #     self.tasks[d["Task id"]].setStyleSheet(
-        #         self.color[d["Task id"] % 5])
-        #     self.tasks[d["Task id"]].setText("{}".format(d["Task id"]))
-        #     self.tasks[d["Task id"]].setAlignment(Qt.AlignCenter)
-        #     self.anim = QPropertyAnimation(self.tasks[d["Task id"]], b"pos")
-        
+      
         # task arriving into batch queue, ready to go into scheduler
         if d['Event Type'] == 'INCOMING':
             self.tasks[d["Task id"]].resize(35, 35)
@@ -640,19 +633,7 @@ class GUI(QMainWindow):
             self.anim.stop()
             self.tasks[d["Task id"]].deleteLater()
             self.deletedTask.append(d["Task id"])
-        # elif d['Event Type'] == "XCOMPLETED":
-        #     coord_x = self.m_coords[d['Machine']][0]
-        #     coord_y = self.m_coords[d['Machine']][1]
-        #     self.anim.setStartValue(QPoint(coord_x, coord_y))
-        #     self.anim.setEndValue(
-        #         QPoint(self.m_coords[d['Machine']][0]+100, self.m_coords[d['Machine']][1]))
-        #     self.anim.setDuration(self.timer/4)
-        #     self.finishedTasks[d['Machine']].append(d['Task id'])
-        #     self.finishedTasksLabel[d['Machine']].setText("Finished tasks: {}".format(
-        #     self.finishedTasks[d['Machine']][:-4:-1]))  # show last 3 element of finished tasks and reverse it
-        #     self.anim.stop()
-        #     self.tasks[d["Task id"]].deleteLater()
-        #     self.deletedTask.append(d["Task id"])
+      
         elif d['Event Type'] == "DROPPED_RUNNING_TASK":
             self.tasks[d["Task id"]].deleteLater()
             self.deletedTask.append(d["Task id"])

@@ -165,9 +165,9 @@ class Simulator(QObject):
                 assigned_machine = self.scheduler.schedule() 
                 if config.gui == 1 and assigned_machine != None:
                     time.sleep(self.timer)
-                    self.progress.emit({"Task id":task.id,"Event Type":event.event_type.name,"Time":event.time, "Machine": assigned_machine.id, "Type":'task', "FROM":169})
+                    self.progress.emit({"Task id":task.id,"Event Type":event.event_type.name,"Time":event.time, "Machine": assigned_machine.id, "Type":'task'})
                     time.sleep(self.timer)
-                    self.progress.emit({"Task id":task.id,"Event Type":task.status.name, "Time":task.completion_time, "Machine": assigned_machine.id, "Type":'task', "FROM":171})
+                    self.progress.emit({"Task id":task.id,"Event Type":task.status.name, "Time":task.completion_time, "Machine": assigned_machine.id, "Type":'task'})
                     
 
             # Task is added to the scheduler batch_queue, if there are no available machines, 
@@ -184,9 +184,9 @@ class Simulator(QObject):
                     break
                 if config.gui == 1 :
                     time.sleep(self.timer)
-                    self.progress.emit({"Task id":task.id,"Event Type":event.event_type.name,"Time":event.time, "Machine": assigned_machine.id, "Type":'task', "FROM":184})
+                    self.progress.emit({"Task id":task.id,"Event Type":event.event_type.name,"Time":event.time, "Machine": assigned_machine.id, "Type":'task'})
                     time.sleep(self.timer)
-                    self.progress.emit({"Task id":task.id,"Event Type":task.status.name, "Time":task.completion_time, "Machine": assigned_machine.id, "Type":'task', "FROM":186})
+                    self.progress.emit({"Task id":task.id,"Event Type":task.status.name, "Time":task.completion_time, "Machine": assigned_machine.id, "Type":'task'})
                     
 
             # Task will be terminated upon completion
@@ -194,7 +194,7 @@ class Simulator(QObject):
                 machine = task.assigned_machine
                 if config.gui == 1:
                     time.sleep(self.timer)
-                    self.progress.emit({"Task id":task.id,"Event Type":event.event_type.name, "Time":task.completion_time, "Machine": machine.id, "Type":'task', "FROM":197})
+                    self.progress.emit({"Task id":task.id,"Event Type":event.event_type.name, "Time":task.completion_time, "Machine": machine.id, "Type":'task'})
                 ### add to gui batch_queue
                 machine.terminate(task)      
                 self.scheduler.schedule()
@@ -212,7 +212,7 @@ class Simulator(QObject):
                 machine = task.assigned_machine
                 if config.gui == 1 :
                     time.sleep(self.timer)
-                    self.progress.emit({"Task id":task.id,"Event Type":event.event_type.name,"Time":event.time, "Type":'task', "FROM":214})
+                    self.progress.emit({"Task id":task.id,"Event Type":event.event_type.name,"Time":event.time, "Type":'task'})
                 machine.drop()
                 self.scheduler.schedule() 
                     # time.sleep(self.timer)
